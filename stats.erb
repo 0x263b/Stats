@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<title><%= @config["title"] %> Stats</title>
+<style>
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 300;
+	src: local('Roboto Light'), local('Roboto-Light'), url(https://fonts.gstatic.com/s/roboto/v15/Hgo13k-tfSpn0qi1SFdUfZBw1xU1rKptJj_0jans920.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Roboto'), local('Roboto-Regular'), url(https://fonts.gstatic.com/s/roboto/v15/oMMgfZMQthOryQo9n22dcuvvDin1pK8aKteLpeZ5c0A.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 500;
+	src: local('Roboto Medium'), local('Roboto-Medium'), url(https://fonts.gstatic.com/s/roboto/v15/RxZJdnzeo3R5zSexge8UUZBw1xU1rKptJj_0jans920.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+	* {
+		box-sizing: border-box;
+	}
+	html, body {
+		font: normal 16px/1.5 "Roboto", "Open Sans", "Noto Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+		transition: opacity 0.5s ease-in-out;
+		margin: 0;
+		background-color: #fff;
+		color: #333;
+	}
+	a {
+		text-decoration: none;
+		color: black;
+	}
+	a:hover {
+		color: #534e94;
+	}
+	main {
+		max-width: 630px;
+		padding: 15px;
+		margin: auto;
+		display: block;
+	}
+	h1 {
+		margin: 50px 0;
+		font-weight: 300;
+		text-align: center;
+	}
+	h2 {
+		font-weight: 300;
+		text-align: center;
+		margin-bottom: 50px;
+	}
+	hr {
+		border: none;
+		height: 1px;
+		background-color: #eee;
+		margin: 50px auto;
+		max-width: 150px;
+	}
+	p {
+		max-width: 400px;
+		color: #555;
+		font-weight: 300;
+		margin: auto;
+	}
+	.activity-numbers {
+		display: flex;
+		flex-flow: row wrap;
+		width: 100%;
+	}
+		.activity-numbers div {
+			padding: 10px 0;
+			font-size: 30px;
+			font-weight: 300;
+			flex-grow: 1;
+			text-align: center;
+		}
+		@media (max-width: 500px) {
+			.activity-numbers div { 
+				min-width: 140px; 
+				flex: 1 1 0; 
+				-webkit-flex: 1 1 auto; 
+			}
+		}
+		.activity-numbers span {
+			display: block;
+			font-size: 12px;
+			font-weight: 500;
+			text-transform: uppercase;
+		}
+		.activity-numbers small {
+			font-size: 18px;
+		}
+	text {
+		font-size: 12px;
+	}
+	rect:hover {
+		fill: #00d1fd;
+	}
+	.scale-1 { fill: #c2d0de; border-color: #c2d0de; }
+	.scale-2 { fill: #8495ab; border-color: #8495ab; }
+	.scale-3 { fill: #4e5f73; border-color: #4e5f73; }
+	.scale-4 { fill: #534e94; border-color: #534e94; }
+	.scale-5 { fill: #825db8; border-color: #825db8; }
+	.scale-6 { fill: #c56edd; border-color: #c56edd; }
+
+	.key {
+		display: flex;
+		position: absolute;
+		top: 237px;
+	}
+	.key div {
+		border-top-width: 4px;
+		border-top-style: solid;
+		width: 36px;
+		font-size: 11px;
+		padding: 5px 0 0;
+		margin-right: 1px;
+	}
+	@media (max-width: 500px) {
+		.key div:nth-child(odd) {
+			display: none;
+		}
+	}
+
+	#charts {
+		position: relative;
+		height: 275px;
+		max-width: 600px;
+	}
+	.chart {
+		position: absolute;
+		top: 0;
+		left: 0;
+		max-width: 600px;
+		width: 100%;
+		overflow-x: scroll;
+		overflow-y: hidden;
+		text-align: center;
+	}
+	.chart::-webkit-scrollbar { display: none; }
+	#charts .hover {
+		position: absolute;
+		top: 228px;
+		right: 0;
+		font-size: 14px;
+	}
+		#charts .hover .date, 
+		#charts .hover .lines {
+			text-align: right;
+		}
+		@media (max-width: 500px) {
+			#charts .hover { font-size: 12px; }
+		}
+	#hourly {
+		position: relative;
+		height: 170px;
+		max-width: 340px;
+		margin: 20px auto;
+	}
+	#hourly .hover {
+		position: absolute;
+		top: 135px;
+		display: flex;
+		width: 100%;
+		font-size: 14px;
+	}
+		#hourly .lines {
+			text-align: right;
+			flex-grow: 1;
+			
+		}
+	#active-users, #top-users {
+		border-spacing: 0;
+		width: 100%;
+	}
+	table {
+		margin-bottom: 50px;
+	}
+	th {
+		text-align: right;
+		text-transform: uppercase;
+		font-size: 12px;
+		font-weight: 500;
+		cursor: pointer;
+		padding-bottom: 10px;
+	}
+	td {
+		padding: 5px 0;
+		border-bottom: 1px solid #ddd;
+	}
+	td:first-child {
+		font-size: 20px;
+		font-weight: 300;
+	}
+	td:not(:first-child) {
+		text-align: right;
+	}
+	td img {
+		width: 45px;
+		height: 45px;
+		background-color: #aaa;
+		border-radius: 4px;
+		vertical-align: middle;
+		margin-right: 15px;
+	}
+	@media (max-width: 500px) {
+		td:first-child {
+			font-size: 16px;
+			font-weight: normal;
+		}
+		th:nth-last-child(2),
+		td:nth-last-child(2),
+		th:last-child,
+		td:last-child {
+			display: none;
+		}
+		td img {
+			width: 25px;
+			height: 25px;
+		}
+	}
+
+</style>
+</head>
+<body id="body">
+<script> document.getElementById("body").style.opacity = 0; </script>
+
+<main role="main">
+<h1><%= @config["title"] %></h1>
+<p><%= @config["description"] %></p>
+
+<hr>
+
+<h2>Total Activity</h2>
+<div class="activity-numbers">
+	<div><span>Messages</span> <%= add_commas(@database[:channel][:line_count]) %></div>
+	<div><span>Words</span> <%= add_commas(@database[:channel][:word_count]) %></div>
+	<div><span>Users</span> <%= add_commas(@database[:channel][:user_count]) %></div>
+	<div><span>Days</span> <%= add_commas(@total_days) %></div>
+</div>
+
+<div id="charts">
+	<div class="chart">
+		<svg width="<%= (@days.last[:x] * 10) + 10 %>px" height="275px" version="1.1" 
+			xmlns="http://www.w3.org/2000/svg" 
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			xmlns:data="http://www.examples.com/data">
+			<g id="weeks" stroke="none" stroke-width="1" fill="#8495ab" transform="translate(0,110) scale(1,-1)">
+				<% @weeks.each do |week| -%>
+<rect x="<%= week[:x] * 10 %>" y="0" width="9" height="<%= ((week[:lines].to_f / @weeks_max) * 100).round %>" data:lines="<%= week[:lines] %>" data:first="<%= week[:first] %>" data:last="<%= week[:last] %>"></rect>
+				<% end -%>
+			</g>
+
+			<g id="days" stroke="none" stroke-width="1" fill="none" transform="translate(0,152)">
+				<% @days.each do |day| -%>
+<rect x="<%= day[:x] * 10 %>" y="<%= (day[:y] * 10) %>" width="9" height="9" class="<%= day[:class] %>" data:date="<%= day[:date] %>" data:lines="<%= day[:lines] %>"></rect>
+				<% end -%>
+			</g>
+
+			<g class="labels" stroke="none" stroke-width="0" fill="black" transform="translate(0,111)">
+				<% @labels.each do |label| -%>
+<line x1="<%= (label[:x] * 10) + 4.5 %>" y1="0" x2="<%= (label[:x] * 10) + 4.5 %>" y2="10" stroke="#bbb" stroke-width="1" />
+<text x="<%= (label[:x] * 10) + 4.5 %>" y="25" text-anchor="middle"><%= label[:month] %></text>
+<line x1="<%= (label[:x] * 10) + 4.5 %>" y1="30" x2="<%= (label[:x] * 10) + 4.5 %>" y2="40" stroke="#bbb" stroke-width="1" />
+				<% end -%>
+			</g>
+		</svg>
+	</div>
+
+	<div class="key">
+		<div class="scale-1">0</div>
+		<div class="scale-2"><%= @day_scale %></div>
+		<div class="scale-3"><%= @day_scale * 2 %></div>
+		<div class="scale-4"><%= @day_scale * 3 %></div>
+		<div class="scale-5"><%= @day_scale * 4 %></div>
+		<div class="scale-6"><%= @day_scale * 5 %></div>
+	</div>
+
+	<div class="hover">
+		<div class="date"></div>
+		<div class="lines"></div>
+	</div>
+</div>
+
+<hr>
+
+<h2>Most Active Times</h2>
+
+<div id="hourly">
+	<div class="chart">
+		<svg width="340px" height="170px" version="1.1" 
+			xmlns="http://www.w3.org/2000/svg" 
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			xmlns:data="http://www.examples.com/data">
+			<g id="hours" stroke="none" stroke-width="1" fill="#8495ab" transform="translate(0,100) scale(1,-1)">
+				<% @database[:hours].each_with_index do |hour, index| -%>
+<rect x="<%= index * 10 %>" y="0" width="9" height="<%= ((hour.to_f / @hours_max) * 100).round %>"></rect>
+				<% end -%>
+			</g>
+			<g class="labels" transform="translate(0,115)">
+				<text x="0"   y="0">A</text>
+				<text x="40"  y="0">4</text>
+				<text x="80"  y="0">8</text>
+				<text x="120" y="0">P</text>
+				<text x="160" y="0">4</text>
+				<text x="200" y="0">8</text>
+			</g>
+
+			<g id="weekdays" stroke="none" stroke-width="1" fill="#8495ab" transform="translate(270,100) scale(1,-1)">
+				<% @weekdays.each_with_index do |day, index| -%>
+<rect x="<%= index * 10 %>" y="0" width="9" height="<%= ((day.to_f / @weekdays_max) * 100).round %>" data:lines="<%= day %>"></rect>
+				<% end -%>
+			</g>
+			<g class="labels" transform="translate(270,115)">
+				<text x="10" y="0">M</text>
+				<text x="30" y="0">W</text>
+				<text x="50" y="0">F</text>
+			</g>
+		</svg>
+	</div>
+	<div class="hover">
+		<div class="timezone-label">UTC</div>
+		<div class="lines"></div>
+	</div>
+</div>
+
+<div class="activity-numbers">
+	<div><span>Average Day</span> <%= add_commas(@database[:channel][:mean].round) %><small> lines</small></div>
+	<div><span>Average Week</span> <%= add_commas(@weeks_mean.round) %><small> lines</small></div>
+	<div><span>Most Active Day</span> <%= add_commas(@database[:channel][:max_day][:lines]) %><small> lines</small></div>
+	<div><span>Most Active Week</span> <%= add_commas(@weeks_max) %><small> lines</small></div>
+</div>
+
+<hr>
+
+<h2>Active Users</h2>
+<table id="active-users">
+	<thead>
+	<tr>
+		<th></th>
+		<th>Words</th>
+		<th>Vocabulary</th>
+		<th>Words/day</th>
+		<th>Last spoke</th>
+	</tr>
+	</thead>
+	<tbody>
+	<% @active_users.each do |user| %>
+	<tr>
+		<td data="<%= user[:username] %>"><a href="<%= user[:url] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a></td>
+		<td data="<%= user[:word_count] %>"><%= add_commas(user[:word_count]) %></td>
+		<td data="<%= user[:vocabulary] %>"><%= add_commas(user[:vocabulary]) %></td>
+		<td data="<%= user[:words_day].round %>"><%= add_commas(user[:words_day].round) %></td>
+		<td class="date" data="<%= user[:last_seen] %>"><%= Time.at(user[:last_seen]).utc.to_datetime.strftime("%a, %b %e") %></td>
+	</tr>
+	<% end %>
+	</tbody>
+</table>
+
+
+<h2>Top Users</h2>
+<table id="top-users">
+	<thead>
+	<tr>
+		<th></th>
+		<th>Words</th>
+		<th>Vocabulary</th>
+		<th>Words/day</th>
+		<th>Last spoke</th>
+	</tr>
+	</thead>
+	<tbody>
+	<% @top_users.each do |user| %>
+	<tr>
+		<td data="<%= user[:username] %>"><a href="<%= user[:url] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a></td>
+		<td data="<%= user[:word_count] %>"><%= add_commas(user[:word_count]) %></td>
+		<td data="<%= user[:vocabulary] %>"><%= add_commas(user[:vocabulary]) %></td>
+		<td data="<%= user[:words_day].round %>"><%= add_commas(user[:words_day].round) %></td>
+		<td class="date" data="<%= user[:last_seen] %>"><%= Time.at(user[:last_seen]).utc.to_datetime.strftime("%a, %b %e") %></td>
+	</tr>
+	<% end %>
+	</tbody>
+</table>
+</main>
+<script>
+"use strict"
+
+// Scroll chart to the left if it overflows
+var element = document.querySelector("#charts .chart")
+element.scrollLeft = element.scrollWidth
+
+// myArray.pushArray([1, 2, 3], [4, 5 ,6]) → [1, 2, 3, 4, 5, 6]
+Array.prototype.pushArray = function() {
+	this.push.apply(this, this.concat.apply([], arguments))
+}
+
+// 1234 → 1,234
+function addCommas(number) {
+	var parts = number.toString().split(".")
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+	return parts.join(".")
+}
+
+function listenAll(selector, event, fn) {
+	var list = document.querySelectorAll(selector)
+	for (var i = 0, len = list.length; i < len; i++) {
+		list[i].addEventListener(event, fn, false)
+	}
+}
+
+function insertHTML(selector, html) {
+	document.querySelector(selector).innerHTML = html
+}
+
+function daysHover(event) {
+	var lines = event.target.getAttribute("data:lines")
+	var date  = event.target.getAttribute("data:date")
+	insertHTML("#charts .hover .date", date)
+	insertHTML("#charts .hover .lines", addCommas(lines) + " lines")
+}
+
+function weeksHover(event) {
+	var lines = event.target.getAttribute("data:lines")
+	var first = event.target.getAttribute("data:first")
+	var last  = event.target.getAttribute("data:last")
+	insertHTML("#charts .hover .date", first + " – " + last)
+	insertHTML("#charts .hover .lines", addCommas(lines) + " lines")
+}
+
+function hoursHover(event) {
+	var lines = event.target.getAttribute("data:lines")
+	insertHTML("#hourly .hover .lines", addCommas(lines) + " lines")
+}
+
+// Shift timezone
+var svgns = "http://www.w3.org/2000/svg"
+
+var local_time = new Date()
+var local_zone = local_time.getTimezoneOffset()/60
+
+var timezone_label = (local_zone > 0) ? "GMT–" + local_zone : "GMT+" + Math.abs(local_zone)
+document.querySelector(".timezone-label").innerHTML = timezone_label
+
+function parseHours(array, selector){
+	var node = document.querySelector(selector)
+
+	// Empty the original SVG
+	while (node.hasChildNodes()) {
+		node.removeChild(node.lastChild)
+	}
+
+	if (local_zone < 0) local_zone = 24 + local_zone
+
+	// Shift the array
+	var max_lines = Math.max.apply(Math, array)
+	var spliced = array.splice(0, local_zone)
+	var adjusted_hours = []
+	adjusted_hours.pushArray(array, spliced)
+
+	// Add new elements
+	adjusted_hours.forEach(function(lines, index){
+		var height = Math.round((lines/max_lines) * 100)
+		var x = index * 10
+
+		var rect = document.createElementNS(svgns, 'rect')
+			rect.setAttributeNS(null, 'x', x)
+			rect.setAttributeNS(null, 'y', '0')
+			rect.setAttributeNS(null, 'height', height)
+			rect.setAttributeNS(null, 'width',  '9')
+			rect.setAttributeNS("http://www.examples.com/data", 'data:lines',  lines)
+
+		node.appendChild(rect)
+	})
+}
+
+
+// Natural compare correctly returns 123 > 45
+function naturalCompare(a, b) {
+	var ax = [], bx = []
+
+	a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) })
+	b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) })
+	
+	while (ax.length && bx.length) {
+		var an = ax.shift()
+		var bn = bx.shift()
+		var nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1])
+		if(nn) return nn
+	}
+
+	return ax.length - bx.length
+}
+
+// Sort rows when you click on <th>
+function sortTable(table, col, reverse) {
+	var tb = table.tBodies[0], 
+		tr = Array.prototype.slice.call(tb.rows, 0)
+	
+	reverse = -((+reverse) || -1)
+
+	tr = tr.sort(function(a, b) { 
+		return reverse * naturalCompare(b.cells[col].getAttribute("data").trim(), a.cells[col].getAttribute("data").trim()) 
+	})
+
+	// append each row in order
+	for (var i = 0; i < tr.length; ++i) {
+		tb.appendChild(tr[i])
+	}
+}
+
+// Add event listener to ever <th>
+function makeSortable(table) {
+	var th = table.tHead
+	th && (th = th.rows[0]) && (th = th.cells)
+	for (var i = 0; i < th.length; ++i) {
+		(function(i) {
+			var dir = 1
+			th[i].addEventListener('click', function() {
+				sortTable(table, i, (dir = 1 - dir))
+			})
+		}(i))
+	}
+}
+
+// Find every table
+function makeAllSortable() {
+	var t = document.getElementsByTagName('table')
+	for (var i = 0; i < t.length; ++i) {
+		makeSortable(t[i])
+	}
+}
+
+// Format last seen dates
+function formatDate(timestamp) {
+	var shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+		shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+		date = new Date(timestamp * 1000)
+
+	var w = shortDays[date.getDay()],
+		m = shortMonths[date.getMonth()],
+		d = date.getDate()
+
+	return w + ", " + m + " " + d;
+}
+
+function formatAllDates() {
+	var nodes = document.querySelectorAll('.date')
+	for (var i = 0; i < nodes.length; ++i) {
+		nodes[i].innerHTML = formatDate(nodes[i].getAttribute("data"))
+	}
+}
+
+(function(){
+	parseHours(<%= @database[:hours] %>, "#hours")
+	makeAllSortable()
+	formatAllDates()
+
+	listenAll("#days rect",  "mouseover", daysHover)
+	listenAll("#weeks rect", "mouseover", weeksHover)
+	listenAll("#hours rect", "mouseover", hoursHover)
+	listenAll("#weekdays rect", "mouseover", hoursHover)
+
+	document.getElementById("body").style.opacity = 1
+})()
+
+</script>
+</body>
+</html>
+
