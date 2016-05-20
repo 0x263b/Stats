@@ -13,17 +13,17 @@ config = ARGV.first
 directory = File.expand_path(File.dirname(__FILE__))
 
 if config.nil?
-  @config = YAML.load_file("#{directory}/config.yml")
+  @config = YAML.load_file("#{directory}/config.yaml")
 else
   @config = YAML.load_file("#{directory}/#{config}")
 end
 
-if @config["database_location"].nil?
-  @config["database_location"] = "#{directory}/database.json"
+if @config[:database_location].nil?
+  @config[:database_location] = "#{directory}/database.json"
 end
 
-if @config["save_location"].nil?
-  @config["save_location"] = "#{directory}/stats.html"
+if @config[:save_location].nil?
+  @config[:save_location] = "#{directory}/stats.html"
 end
 
 now = Date.today
@@ -48,8 +48,8 @@ def add_commas(number)
 end
 
 @correct_user = Hash.new
-if !@config["correct"].nil?
-  @config["correct"].each do |key, value|
+if !@config[:correct].nil?
+  @config[:correct].each do |key, value|
     value.each do |v|
       @correct_user[v] = key
     end
@@ -97,12 +97,6 @@ def new_user(nick, timestamp)
   }
 end
 
-def median(array)
-  sorted = array.sort
-  len = sorted.length
-  return (sorted[(len - 1) / 2] + sorted[len / 2]) / 2.0
-end
-
 def parse_time(data)
   return DateTime.strptime(data, "%F %T %z").to_time.utc
 end
@@ -126,7 +120,7 @@ def parse_message(data, action)
     words      = parsed[3].downcase.split(" ")
 
     # ignore list
-    return if @config["ignore"].any? { |user| username =~ /#{user}/i }
+    return if @config[:ignore].any? { |user| username =~ /#{user}/i }
 
     # All time stats
     day = timestamp.strftime("%F")
@@ -203,8 +197,8 @@ def iterate_lines(line)
 end
 
 # Begin
-if @config["directory"]
-  Dir.glob("#{@config["location"]}/**/*") do |file|
+if @config[:directory]
+  Dir.glob("#{@config[:location]}/**/*") do |file|
     next if file.start_with?(".")
     next unless File.file?(file)
 
@@ -213,7 +207,7 @@ if @config["directory"]
     end
   end
 else 
-  File.open(@config["location"]).each_line do |line|
+  File.open(@config[:location]).each_line do |line|
     iterate_lines(line)
   end
 end
@@ -225,10 +219,10 @@ end
 @database[:channel][:active_user_count] = @database[:active_users].length
 
 daily_lines = Array.new
-
 @database[:days].each do |day, lines|
   daily_lines << lines
 end
+@database[:channel][:mean] = daily_lines.mean
 
 def clean_user(nick)
   nick[:words].flatten!.uniq!
@@ -246,11 +240,11 @@ def clean_user(nick)
   nick[:words_day]   = nick[:word_count]/nick[:days_total].to_f
   nick[:max_day]     = largest_hash_key(nick[:days])
 
-  return nick if @config["profiles"].nil?
+  return nick if @config[:profiles].nil?
 
-  if @config["profiles"].has_key?(nick[:username])
-    nick[:url] = @config["profiles"][nick[:username]]["url"] if @config["profiles"][nick[:username]].has_key?("url")
-    nick[:avatar] = @config["profiles"][nick[:username]]["avatar"] if @config["profiles"][nick[:username]].has_key?("avatar")
+  if @config[:profiles].has_key?(nick[:username])
+    nick[:url] = @config[:profiles][nick[:username]][:url] if @config[:profiles][nick[:username]].has_key?(:url)
+    nick[:avatar] = @config[:profiles][nick[:username]][:avatar] if @config[:profiles][nick[:username]].has_key?(:avatar)
   end
 
   return nick
@@ -264,18 +258,15 @@ end
   nick = clean_user(nick)
 end
 
-@database[:channel][:mean] = daily_lines.mean
-
 max_day = largest_hash_key(@database[:days])
-
 @database[:channel][:max_day] = {:day => max_day[0], :lines => max_day[1]}
 
-File.write(@config["database_location"], JSON.pretty_generate(@database))
+File.write(@config[:database_location], JSON.pretty_generate(@database))
 
-if @config["heatmap_scale"].nil?
+if @config[:heatmap_scale].nil?
   @day_scale = 100
 else 
-  @day_scale = @config["heatmap_scale"]
+  @day_scale = @config[:heatmap_scale]
 end
 
 @hours_max = @database[:hours].max
@@ -287,16 +278,11 @@ end
 first_day = Time.at(@database[:channel][:first]).utc.to_datetime
 last_day  = Time.at(@database[:channel][:last]).utc.to_datetime
 
-first_year = first_day.year
-last_year  = last_day.year
-
 x = 0
 week_first = nil
 week_last = nil
 week_lines = 0
 @weeks_max = 0
-
-@total_days = (last_day - first_day).to_i
 
 first_day.upto(last_day) do |date|
   week_first = date.strftime("%b %e") if week_first.nil?
@@ -361,5 +347,5 @@ end
 template = ERB.new(File.read("#{directory}/stats.erb"), nil, "-")
 html_content = template.result(binding)
 
-File.write(@config["save_location"], html_content)
+File.write(@config[:save_location], html_content)
 

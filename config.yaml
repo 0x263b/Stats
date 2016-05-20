@@ -1,34 +1,34 @@
 # log location should be full path on Lignux
 # eg: /home/Alice/irc/logs/file.log
 # or: /home/Alice/irc/logs/directory
-location: "/home/Alice/irc/logs/#channel.log"
+:location: "/home/Alice/irc/logs/#channel.log"
 # Is this a directory?
-directory: no
+:directory: no
 # .html save location, full path and filename
 # eg: /var/www/example.com/stats.html
 # leave blank for default
-save_location: 
-database_location: 
+:save_location: 
+:database_location: 
 
 # Page info
-title: Example
-description: This is an example
+:title: Example
+:description: This is an example
 # Scale for the heatmap
-heatmap_scale: 200
+:heatmap_scale: 200
 
 # ignore list
-ignore:
+:ignore:
   # - somebot
   # - otherbot
 
 # correct nick names
-correct:
+:correct:
   # joebloggs:
   #   - joebloggs_away
   #   - joebloggs_phone
 
 # user profiles
-profiles:
+:profiles:
   # joebloggs:
   #   url: https://www.example.com
   #   avatar: https://secure.gravatar.com/avatar/ba1e13e0887456893b07e4ee8e78aece

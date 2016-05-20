@@ -22,19 +22,19 @@ $ ./stats.rb other_config.yml
 The absolute minimal config file:
 
 ```yaml
-location: "/home/Alice/irc/logs/#channel.log"
-directory: no
+:location: "/home/Alice/irc/logs/#channel.log"
+:directory: no
 
-save_location: 
-database_location: 
+:save_location: 
+:database_location: 
 
-title: 
-description:
-heatmap_scale:
+:title: 
+:description:
+:heatmap_scale:
 
-ignore:
-correct:
-profiles:
+:ignore:
+:correct:
+:profiles:
 
 ```
 
