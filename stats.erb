@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title><%= @config["title"] %> Stats</title>
 <style>
 @font-face {
@@ -27,58 +27,241 @@
 	src: local('Roboto Medium'), local('Roboto-Medium'), url(https://fonts.gstatic.com/s/roboto/v15/RxZJdnzeo3R5zSexge8UUZBw1xU1rKptJj_0jans920.woff2) format('woff2');
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
+* {
+	box-sizing: border-box;
+}
+html,body {
+	font: normal 16px/1.5 "Roboto", "Open Sans", "Noto Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+	-webkit-transition: opacity 0.5s ease-in-out;
+	transition: opacity 0.5s ease-in-out;
+	margin: 0;
+	background-color: #fff;
+	color: #333;
+}
+a {
+	text-decoration: none;
+	color: black;
+}
+a:hover {
+	color: #534e94;
+}
+main {
+	max-width: 630px;
+	padding: 15px;
+	margin: auto;
+	display: block;
+}
+h1 {
+	margin: 50px 0;
+}
+h1,h2 {
+	font-weight: 300;
+	text-align: center;
+}
+h2 {
+	margin-bottom: 50px;
+}
+hr {
+	border: none;
+	height: 1px;
+	background-color: #eee;
+	margin: 50px auto;
+	max-width: 150px;
+}
+p {
+	max-width: 400px;
+	color: #555;
+	font-weight: 300;
+	margin: auto;
+}
+.activity-numbers {
+	display: -webkit-box;
+	display: flex;
+	flex-flow: row wrap;
+	width: 100%;
+}
+.activity-numbers div {
+	padding: 10px 0;
+	font-size: 30px;
+	font-weight: 300;
+	-webkit-box-flex: 1;
+	        flex-grow: 1;
+	text-align: center;
+}
 
-*{box-sizing:border-box}
-html,body{font:normal 16px/1.5 Roboto,"Open Sans","Noto Sans",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;-webkit-transition:opacity .5s ease-in-out;transition:opacity .5s ease-in-out;margin:0;background-color:#fff;color:#333}
-a{text-decoration:none;color:#000}
-a:hover{color:#534e94}
-main{max-width:630px;padding:15px;margin:auto;display:block}
-h1{margin:50px 0;font-weight:300;text-align:center}
-h2{font-weight:300;text-align:center;margin-bottom:50px}
-hr{border:none;height:1px;background-color:#eee;margin:50px auto;max-width:150px}
-p{max-width:400px;color:#555;font-weight:300;margin:auto}
-.activity-numbers{display:-webkit-box;display:-ms-flexbox;display:flex;-ms-flex-flow:row wrap;flex-flow:row wrap;width:100%}
-.activity-numbers div{padding:10px 0;font-size:30px;font-weight:300;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1;text-align:center}
 @media (max-width: 500px) {
-.activity-numbers div{min-width:140px;-webkit-box-flex:1;-ms-flex:1 1 0;flex:1 1 0;-webkit-flex:1 1 auto}
+
+	.activity-numbers div {
+		min-width: 140px;
+		-webkit-box-flex: 1;
+		        flex: 1 1 0;
+		-webkit-flex: 1 1 auto;
+	}
 }
-.activity-numbers span{display:block;font-size:12px;font-weight:500;text-transform:uppercase}
-.activity-numbers small{font-size:18px}
-text{font-size:12px}
-rect:hover{fill:#00d1fd}
-.scale-1{fill:#c2d0de;border-color:#c2d0de}
-.scale-2{fill:#8495ab;border-color:#8495ab}
-.scale-3{fill:#4e5f73;border-color:#4e5f73}
-.scale-4{fill:#534e94;border-color:#534e94}
-.scale-5{fill:#825db8;border-color:#825db8}
-.scale-6{fill:#c56edd;border-color:#c56edd}
-.key{display:-webkit-box;display:-ms-flexbox;display:flex;position:absolute;top:237px}
-.key div{border-top-width:4px;border-top-style:solid;width:36px;font-size:11px;padding:5px 0 0;margin-right:1px}
-@media (max-width: 500px) {
-.key div:nth-child(odd){display:none}
+
+.activity-numbers span {
+	display: block;
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
 }
-#charts{position:relative;height:275px;max-width:600px}
-.chart{position:absolute;top:0;left:0;max-width:600px;width:100%;overflow-x:auto;text-align:center}
-.chart::-webkit-scrollbar{display:none}
-#charts .hover{position:absolute;top:228px;right:0;font-size:14px}
-#charts .hover .date,#charts .hover .lines{text-align:right}
-@media (max-width: 500px) {
-#charts .hover{font-size:12px}
+.activity-numbers small {
+	font-size: 18px;
 }
-#hourly{position:relative;height:170px;max-width:340px;margin:20px auto}
-#hourly .hover{position:absolute;top:135px;display:-webkit-box;display:-ms-flexbox;display:flex;width:100%;font-size:14px}
-#hourly .lines{text-align:right;-webkit-box-flex:1;-ms-flex-positive:1;flex-grow:1}
-#active-users,#top-users{border-spacing:0;width:100%}
-table{margin-bottom:50px}
-th{text-align:right;text-transform:uppercase;font-size:12px;font-weight:500;cursor:pointer;padding-bottom:10px}
-td{padding:5px 0;border-bottom:1px solid #ddd}
-td:first-child{font-size:20px;font-weight:300}
-td:not(:first-child){text-align:right}
-td img{width:45px;height:45px;background-color:#aaa;border-radius:4px;vertical-align:middle;margin-right:15px}
+text {
+	font-size: 12px;
+}
+rect:hover {
+	fill: #00d1fd;
+}
+.scale-1 {
+	fill: #c2d0de;
+	border-color: #c2d0de;
+}
+.scale-2 {
+	fill: #8495ab;
+	border-color: #8495ab;
+}
+.scale-3 {
+	fill: #4e5f73;
+	border-color: #4e5f73;
+}
+.scale-4 {
+	fill: #534e94;
+	border-color: #534e94;
+}
+.scale-5 {
+	fill: #825db8;
+	border-color: #825db8;
+}
+.scale-6 {
+	fill: #c56edd;
+	border-color: #c56edd;
+}
+.key {
+	display: -webkit-box;
+	display: flex;
+	position: absolute;
+	top: 237px;
+}
+.key div {
+	border-top-width: 4px;
+	border-top-style: solid;
+	width: 36px;
+	font-size: 11px;
+	padding: 5px 0 0;
+	margin-right: 1px;
+}
+
 @media (max-width: 500px) {
-td:first-child{font-size:16px;font-weight:400}
-th:nth-last-child(2),td:nth-last-child(2),th:last-child,td:last-child{display:none}
-td img{width:25px;height:25px}
+
+	.key div:nth-child(odd) {
+		display: none;
+	}
+}
+
+#charts {
+	position: relative;
+	height: 275px;
+}
+#charts,.chart {
+	max-width: 600px;
+}
+.chart {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	overflow-x: auto;
+	text-align: center;
+}
+.chart::-webkit-scrollbar {
+	display: none;
+}
+#charts .hover {
+	position: absolute;
+	top: 228px;
+	right: 0;
+	font-size: 14px;
+}
+#charts .hover .date,#charts .hover .lines {
+	text-align: right;
+}
+
+@media (max-width: 500px) {
+
+	#charts .hover {
+		font-size: 12px;
+	}
+}
+
+#hourly {
+	position: relative;
+	height: 170px;
+	max-width: 340px;
+	margin: 20px auto;
+}
+#hourly .hover {
+	position: absolute;
+	top: 135px;
+	display: -webkit-box;
+	display: flex;
+	width: 100%;
+	font-size: 14px;
+}
+#hourly .lines {
+	text-align: right;
+	-webkit-box-flex: 1;
+	        flex-grow: 1;
+}
+#active-users,#top-users {
+	border-spacing: 0;
+	width: 100%;
+}
+table {
+	margin-bottom: 50px;
+}
+th {
+	text-align: right;
+	text-transform: uppercase;
+	font-size: 12px;
+	font-weight: 500;
+	cursor: pointer;
+	padding-bottom: 10px;
+}
+td {
+	padding: 5px 0;
+	border-bottom: 1px solid #ddd;
+}
+td:first-child {
+	font-size: 20px;
+	font-weight: 300;
+}
+td:not(:first-child) {
+	text-align: right;
+}
+td img {
+	width: 45px;
+	height: 45px;
+	background-color: #aaa;
+	border-radius: 4px;
+	vertical-align: middle;
+	margin-right: 15px;
+}
+
+@media (max-width: 500px) {
+
+	td:first-child {
+		font-size: 16px;
+		font-weight: normal;
+	}
+	th:nth-last-child(2),td:nth-last-child(2),th:last-child,td:last-child {
+		display: none;
+	}
+	td img {
+		width: 25px;
+		height: 25px;
+	}
 }
 </style>
 </head>
@@ -424,4 +607,3 @@ function formatAllDates() {
 </script>
 </body>
 </html>
-

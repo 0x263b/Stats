@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
+Encoding.default_external = "UTF-8"
+Encoding.default_internal = "UTF-8"
+
 require 'date'
 require 'cgi'
 require 'json'
@@ -20,9 +23,8 @@ if @config["database_location"].nil?
 end
 
 if @config["save_location"].nil?
-  @config["database_location"] = "#{directory}/stats.html"
+  @config["save_location"] = "#{directory}/stats.html"
 end
-
 
 now = Date.today
 @ten_weeks_ago = (now - 70).to_time.utc
@@ -43,12 +45,6 @@ end
 
 def add_commas(number)
   return number.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
-end
-
-def save_database
-  File.open(@config["database_location"], "w") do |file|
-    file.write(JSON.pretty_generate(@database))
-  end
 end
 
 @correct_user = Hash.new
@@ -274,7 +270,7 @@ max_day = largest_hash_key(@database[:days])
 
 @database[:channel][:max_day] = {:day => max_day[0], :lines => max_day[1]}
 
-save_database
+File.write(@config["database_location"], JSON.pretty_generate(@database))
 
 if @config["heatmap_scale"].nil?
   @day_scale = 100
@@ -303,6 +299,7 @@ week_lines = 0
 @total_days = (last_day - first_day).to_i
 
 first_day.upto(last_day) do |date|
+  week_first = date.strftime("%b %e") if week_first.nil?
   date_f = date.strftime("%F")
 
   y = date.wday
@@ -364,7 +361,5 @@ end
 template = ERB.new(File.read("#{directory}/stats.erb"), nil, "-")
 html_content = template.result(binding)
 
-File.open(@config["save_location"], "w") do |file|
-  file.write html_content
-end
+File.write(@config["save_location"], html_content)
 
