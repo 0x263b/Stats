@@ -7,11 +7,12 @@ require 'yaml'
 require 'erb'
 
 config = ARGV.first
+directory = File.expand_path(File.dirname(__FILE__))
 
 if config.nil?
-  @config = YAML.load_file("#{Dir.getwd}/config.yml")
+  @config = YAML.load_file("#{directory}/config.yml")
 else
-  @config = YAML.load_file("#{Dir.getwd}/#{config}")
+  @config = YAML.load_file("#{directory}/#{config}")
 end
 
 if @config["database_location"].nil?
@@ -360,7 +361,7 @@ end
 @active_users = @database[:active_users][0..9]
 @top_users = @database[:users][0..9]
 
-template = ERB.new(File.read("#{Dir.getwd}/stats.erb"), nil, "-")
+template = ERB.new(File.read("#{directory}/stats.erb"), nil, "-")
 html_content = template.result(binding)
 
 File.open(@config["save_location"], "w") do |file|

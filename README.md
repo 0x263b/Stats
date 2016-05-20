@@ -16,7 +16,7 @@ $ ./stats.rb
 Or use some other config filename
 
 ```
-$ ./stats.rb other_config.yaml
+$ ./stats.rb other_config.yml
 ```
 
 The absolute minimal config file:
