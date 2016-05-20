@@ -16,11 +16,11 @@ else
 end
 
 if @config["database_location"].nil?
-  @config["database_location"] = "#{Dir.getwd}/database.json"
+  @config["database_location"] = "#{directory}/database.json"
 end
 
 if @config["save_location"].nil?
-  @config["database_location"] = "#{Dir.getwd}/stats.html"
+  @config["database_location"] = "#{directory}/stats.html"
 end
 
 
