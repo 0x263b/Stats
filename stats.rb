@@ -277,6 +277,7 @@ end
 
 first_day = Time.at(@database[:channel][:first]).utc.to_datetime
 last_day  = Time.at(@database[:channel][:last]).utc.to_datetime
+@total_days = (last_day - first_day).to_i
 
 x = 0
 week_first = nil

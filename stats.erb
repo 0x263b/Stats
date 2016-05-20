@@ -4,7 +4,7 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title><%= @config["title"] %> Stats</title>
+<title><%= @config[:title] %> Stats</title>
 <style>
 @font-face {
 	font-family: 'Roboto';
@@ -269,8 +269,8 @@ td img {
 <script> document.getElementById("body").style.opacity = 0; </script>
 
 <main role="main">
-<h1><%= @config["title"] %></h1>
-<p><%= @config["description"] %></p>
+<h1><%= @config[:title] %></h1>
+<p><%= @config[:description] %></p>
 
 <hr>
 
