@@ -8,7 +8,7 @@ directory: no
 # eg: /var/www/example.com/stats.html
 # leave blank for default
 save_location: 
-database_file: 
+database_location: 
 
 # Page info
 title: Example

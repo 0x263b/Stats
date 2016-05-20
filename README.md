@@ -26,7 +26,7 @@ location: "/home/Alice/irc/logs/#channel.log"
 directory: no
 
 save_location: 
-database_file: 
+database_location: 
 
 title: 
 description:
