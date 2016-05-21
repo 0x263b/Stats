@@ -8,7 +8,7 @@ Stats/Analytics generator for IRC and Slack channels
 
 ### Usage
 
-Create a `config.yml` file in the same directory as `stats.rb`
+Create a `config.yaml` file in the same directory as `stats.rb`
 
 ```
 $ ./stats.rb 
@@ -16,7 +16,7 @@ $ ./stats.rb
 Or use some other config filename
 
 ```
-$ ./stats.rb other_config.yml
+$ ./stats.rb other_config.yaml
 ```
 
 The absolute minimal config file:

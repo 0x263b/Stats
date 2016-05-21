@@ -56,23 +56,26 @@ if !@config[:correct].nil?
   end
 end
 
-@database = Hash.new
-
-@database[:channel] = {
-  :user_count => 0,
-  :active_user_count => 0,
-  :line_count => 0,
-  :word_count => 0,
-  :max_day    => nil,
-  :mean       => 0,
-  :first      => nil,
-  :last       => nil
-}
-@database[:users] = Array.new
-@database[:active_users] = Array.new
-
-@database[:days]  = Hash.new
-@database[:hours] = Array.new(24, 0)
+if File.file?(@config[:database_location])
+  @database = JSON.parse(File.read(@config[:database_location]), {:symbolize_names => true})
+else
+  @database = Hash.new
+  @database[:channel] = {
+    :user_count => 0,
+    :active_user_count => 0,
+    :line_count => 0,
+    :word_count => 0,
+    :max_day    => nil,
+    :mean       => 0,
+    :first      => nil,
+    :last       => nil
+  }
+  @database[:users] = Array.new
+  @database[:active_users] = Array.new
+  @database[:days]  = Hash.new
+  @database[:hours] = Array.new(24, 0)
+  @database[:generated] = 0
+end
 
 def new_user(nick, timestamp)
   return { 
@@ -109,21 +112,23 @@ def parse_message(data, action)
       parsed = /^\[(.+)\] <(\S+)> (.+)/.match(data)
     end
 
-    username = parsed[2].downcase
-    username = @correct_user[username] if @correct_user.has_key?(username)
-
     timestamp = parse_time(parsed[1])
     unix_timestamp = timestamp.strftime("%s").to_i
+    # skip old lines
+    return if unix_timestamp < @database[:generated]
+
+    username = parsed[2].downcase
+    username = @correct_user[username] if @correct_user.has_key?(username)
+    # ignore list
+    return if @config[:ignore].any? { |user| username =~ /#{user}/i }
 
     message    = (parsed[3].nil? ? parsed[3] : CGI::escapeHTML(parsed[3].strip))
     char_count = parsed[3].length
     words      = parsed[3].downcase.split(" ")
 
-    # ignore list
-    return if @config[:ignore].any? { |user| username =~ /#{user}/i }
-
     # All time stats
     day = timestamp.strftime("%F")
+    day_sym = day.to_sym
 
     if !@database[:users].find{ |h| h[:username] == username }
       @database[:users] << new_user(username, unix_timestamp)
@@ -143,11 +148,11 @@ def parse_message(data, action)
     @database[:channel][:word_count] += words.length
 
     # Days
-    nick[:days][day] = 0 unless nick[:days].has_key?(day)
-    nick[:days][day] += 1
+    nick[:days][day_sym] = 0 unless nick[:days].has_key?(day_sym)
+    nick[:days][day_sym] += 1
 
-    @database[:days][day] = 0 unless @database[:days].has_key?(day)
-    @database[:days][day] += 1
+    @database[:days][day_sym] = 0 unless @database[:days].has_key?(day_sym)
+    @database[:days][day_sym] += 1
 
     # Hours
     @database[:hours][timestamp.hour] += 1
@@ -176,8 +181,8 @@ def parse_message(data, action)
     nick[:char_count] += char_count
     nick[:words] << words
 
-    nick[:days][day] = 0 unless nick[:days].has_key?(day)
-    nick[:days][day] += 1
+    nick[:days][day_sym] = 0 unless nick[:days].has_key?(day_sym)
+    nick[:days][day_sym] += 1
 
     nick[:hours][timestamp.hour] += 1
   rescue
@@ -225,7 +230,7 @@ end
 @database[:channel][:mean] = daily_lines.mean
 
 def clean_user(nick)
-  nick[:words].flatten!.uniq!
+  nick[:words] = nick[:words].flatten.uniq
 
   nick[:words].each { |word| word.gsub!(/[^\d\w]/, "") }
   nick[:words].reject!{ |word| word.start_with?("http") }
@@ -260,6 +265,7 @@ end
 
 max_day = largest_hash_key(@database[:days])
 @database[:channel][:max_day] = {:day => max_day[0], :lines => max_day[1]}
+@database[:generated] = @database[:channel][:last]
 
 File.write(@config[:database_location], JSON.pretty_generate(@database))
 
@@ -296,7 +302,7 @@ first_day.upto(last_day) do |date|
     week_first = date.strftime("%b %e")
   end
 
-  lines = @database[:days][date_f] || 0
+  lines = @database[:days][date_f.to_sym] || 0
   week_lines += lines
   week_last = date.strftime("%b %e")
 
@@ -349,4 +355,3 @@ template = ERB.new(File.read("#{directory}/stats.erb"), nil, "-")
 html_content = template.result(binding)
 
 File.write(@config[:save_location], html_content)
-

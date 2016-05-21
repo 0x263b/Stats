@@ -30,5 +30,5 @@
 # user profiles
 :profiles:
   # joebloggs:
-  #   url: https://www.example.com
-  #   avatar: https://secure.gravatar.com/avatar/ba1e13e0887456893b07e4ee8e78aece
+  #   :url: https://www.example.com
+  #   :avatar: https://secure.gravatar.com/avatar/ba1e13e0887456893b07e4ee8e78aece
