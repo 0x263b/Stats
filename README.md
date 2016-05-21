@@ -23,15 +23,9 @@ Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. Thi
 
 ```yaml
 # Full path to your log file or directory (mandatory)
-# eg: /home/Alice/irc/logs/file.log
-# or: /home/Alice/irc/logs/directory
-:location: "/home/Alice/irc/logs/#channel.log"
-
-# Is this a directory? yes/no
-:directory: no
+:location: 
 
 # Full path to generated .html file
-# eg: /var/www/example.com/stats.html
 :save_location: 
 
 # Full path to database file
@@ -41,8 +35,8 @@ Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. Thi
 :title: 
 :description: 
 
-# Scale for the heatmap (integer)
-:heatmap_scale:
+# The interval (distance between numbers) for the scale on the days heatmap. Integer
+:heatmap_interval:
 
 # Ignore list
 :ignore:
@@ -60,4 +54,40 @@ Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. Thi
   # joebloggs:
   #   :url: https://www.example.com
   #   :avatar: https://secure.gravatar.com/avatar/ba1e13e0887456893b07e4ee8e78aece
+
+```
+
+**Example config**
+
+```yaml
+:location: "/home/Alice/irc/logs/#channel.log"
+
+:save_location: /var/www/example.com/stats.html
+:database_location: /var/www/example.com/database.json
+
+:title: Some Channel
+:description: Some Channel is some channel on some network
+
+:heatmap_interval: 50
+
+:ignore:
+  - somebot
+  - otherbot
+
+:correct:
+  joebloggs:
+    - joebloggs_away
+    - joebloggs_phone
+  fred: 
+    - fred_
+    - freddy
+
+:profiles:
+  joebloggs:
+    :url: https://www.example.com
+    :avatar: https://secure.gravatar.com/avatar/ba1e13e0887456893b07e4ee8e78aece
+  fred:
+    :url: http://www.something.com
+    :avatar: http://www.something.com/stuff/fred.jpg
+    
 ```

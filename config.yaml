@@ -18,7 +18,7 @@
 :description: 
 
 # Scale for the heatmap (integer)
-:heatmap_scale:
+:heatmap_interval:
 
 # Ignore list
 :ignore:

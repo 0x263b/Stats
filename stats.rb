@@ -194,10 +194,6 @@ if !@config.has_key?(:location) or @config[:location].nil?
   abort("please specify a log location")
 end
 
-if !@config.has_key?(:directory) or @config[:directory].nil?
-  @config[:directory] = false
-end
-
 if !@config.has_key?(:database_location) or @config[:database_location].nil?
   @config[:database_location] = "#{directory}/database.json"
 end
@@ -214,8 +210,8 @@ if !@config.has_key?(:description) or @config[:description].nil?
   @config[:description] = ""
 end
 
-if !@config.has_key?(:heatmap_scale) or @config[:heatmap_scale].nil?
-  @config[:heatmap_scale] = 100
+if !@config.has_key?(:heatmap_interval) or @config[:heatmap_interval].nil?
+  @config[:heatmap_interval] = 100
 end
 
 if !@config.has_key?(:ignore)
@@ -259,7 +255,7 @@ else
 end
 
 # Begin
-if @config[:directory]
+if File.directory?(@config[:location])
   Dir.glob("#{@config[:location]}/**/*") do |file|
     next if file.start_with?(".")
     next unless File.file?(file)
@@ -341,15 +337,15 @@ first_day.upto(last_day) do |date|
   @weekdays[date.wday] += lines
 
   case
-  when lines < @config[:heatmap_scale]
+  when lines < @config[:heatmap_interval]
     css_class = "scale-1"
-  when lines < @config[:heatmap_scale] * 2
+  when lines < @config[:heatmap_interval] * 2
     css_class = "scale-2"
-  when lines < @config[:heatmap_scale] * 3
+  when lines < @config[:heatmap_interval] * 3
     css_class = "scale-3"
-  when lines < @config[:heatmap_scale] * 4
+  when lines < @config[:heatmap_interval] * 4
     css_class = "scale-4"
-  when lines < @config[:heatmap_scale] * 5
+  when lines < @config[:heatmap_interval] * 5
     css_class = "scale-5"
   else 
     css_class = "scale-6"
