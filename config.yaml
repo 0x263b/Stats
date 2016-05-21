@@ -1,33 +1,37 @@
-# log location should be full path on Lignux
+# Full path to your log file or directory (mandatory)
 # eg: /home/Alice/irc/logs/file.log
 # or: /home/Alice/irc/logs/directory
 :location: "/home/Alice/irc/logs/#channel.log"
-# Is this a directory?
+
+# Is this a directory? yes/no
 :directory: no
-# .html save location, full path and filename
+
+# Full path to generated .html file
 # eg: /var/www/example.com/stats.html
-# leave blank for default
 :save_location: 
+
+# Full path to database file
 :database_location: 
 
-# Page info
-:title: Example
-:description: This is an example
-# Scale for the heatmap
-:heatmap_scale: 200
+# Page info in the header of generated .html
+:title: 
+:description: 
 
-# ignore list
+# Scale for the heatmap (integer)
+:heatmap_scale:
+
+# Ignore list
 :ignore:
   # - somebot
   # - otherbot
 
-# correct nick names
+# Combine nick names for people who use multiple
 :correct:
   # joebloggs:
   #   - joebloggs_away
   #   - joebloggs_phone
 
-# user profiles
+# Url and Avatar to show in active users table
 :profiles:
   # joebloggs:
   #   :url: https://www.example.com
