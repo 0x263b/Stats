@@ -19,61 +19,31 @@ This script assumes your logs are formatted like so
 
 Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. This will create a `database.json` and `stats.html` in the script directoy.
 
-#### Config explained
+#### Example config
 
 ```yaml
 # Full path to your log file or directory (mandatory)
-:location: 
-
-# Full path to generated .html file
-:save_location: 
-
-# Full path to database file
-:database_location: 
-
-# Page info in the header of generated .html
-:title: 
-:description: 
-
-# The interval (distance between numbers) for the scale on the days heatmap. Integer
-:heatmap_interval:
-
-# Ignore list
-:ignore:
-  # - somebot
-  # - otherbot
-
-# Combine nick names for people who use multiple
-:correct:
-  # joebloggs:
-  #   - joebloggs_away
-  #   - joebloggs_phone
-
-# Url and Avatar to show in active users table
-:profiles:
-  # joebloggs:
-  #   :url: https://www.example.com
-  #   :avatar: https://secure.gravatar.com/avatar/ba1e13e0887456893b07e4ee8e78aece
-
-```
-
-**Example config**
-
-```yaml
 :location: "/home/Alice/irc/logs/#channel.log"
 
+# Full path to generated .html file
 :save_location: /var/www/example.com/stats.html
+
+# Full path to database file
 :database_location: /var/www/example.com/database.json
 
+# Page info in the header of generated .html
 :title: Some Channel
 :description: Some Channel is some channel on some network
 
+# The interval (distance between numbers) for the scale on the days heatmap. Integer
 :heatmap_interval: 50
 
+# Ignore list
 :ignore:
   - somebot
   - otherbot
 
+# Combine nick names for people who use multiple
 :correct:
   joebloggs:
     - joebloggs_away
@@ -82,6 +52,7 @@ Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. Thi
     - fred_
     - freddy
 
+# Url and Avatar to show in active users table
 :profiles:
   joebloggs:
     :url: https://www.example.com
@@ -89,5 +60,4 @@ Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. Thi
   fred:
     :url: http://www.something.com
     :avatar: http://www.something.com/stuff/fred.jpg
-    
 ```

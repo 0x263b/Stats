@@ -1,10 +1,7 @@
 # Full path to your log file or directory (mandatory)
-# eg: /home/Alice/irc/logs/file.log
-# or: /home/Alice/irc/logs/directory
 :location: "/home/Alice/irc/logs/#channel.log"
 
 # Full path to generated .html file
-# eg: /var/www/example.com/stats.html
 :save_location: 
 
 # Full path to database file
