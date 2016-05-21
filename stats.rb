@@ -259,6 +259,7 @@ if File.directory?(@config[:location])
   Dir.glob("#{@config[:location]}/**/*") do |file|
     next if file.start_with?(".")
     next unless File.file?(file)
+    next if File.mtime(file).to_i < @database[:generated]
 
     File.open(file).each_line do |line|
       iterate_lines(line)
