@@ -26,6 +26,10 @@ if @config[:save_location].nil?
   @config[:save_location] = "#{directory}/stats.html"
 end
 
+if @config[:heatmap_scale].nil?
+  @config[:heatmap_scale] = 100
+end
+
 now = Date.today
 @ten_weeks_ago = (now - 70).to_time.utc
 
@@ -60,6 +64,7 @@ if File.file?(@config[:database_location])
   @database = JSON.parse(File.read(@config[:database_location]), {:symbolize_names => true})
 else
   @database = Hash.new
+  @database[:generated] = 0
   @database[:channel] = {
     :user_count => 0,
     :active_user_count => 0,
@@ -70,11 +75,10 @@ else
     :first      => nil,
     :last       => nil
   }
-  @database[:users] = Array.new
   @database[:active_users] = Array.new
-  @database[:days]  = Hash.new
+  @database[:users] = Array.new
   @database[:hours] = Array.new(24, 0)
-  @database[:generated] = 0
+  @database[:days]  = Hash.new
 end
 
 def new_user(nick, timestamp)
@@ -100,6 +104,29 @@ def new_user(nick, timestamp)
   }
 end
 
+def clean_user(nick)
+  nick[:words] = nick[:words].flatten.uniq
+  nick[:words].reject!{ |word| word.start_with?("http") }
+  nick[:words].uniq!
+
+  nick[:vocabulary]  = nick[:words].length
+  nick[:days_total]  = nick[:days].length
+  nick[:words_line]  = nick[:word_count]/nick[:line_count].to_f
+  nick[:line_length] = nick[:char_count]/nick[:line_count].to_f
+  nick[:lines_day]   = nick[:line_count]/nick[:days_total].to_f
+  nick[:words_day]   = nick[:word_count]/nick[:days_total].to_f
+  nick[:max_day]     = largest_hash_key(nick[:days])
+
+  return nick if @config[:profiles].nil?
+
+  if @config[:profiles].has_key?(nick[:username])
+    nick[:url] = @config[:profiles][nick[:username]][:url] if @config[:profiles][nick[:username]].has_key?(:url)
+    nick[:avatar] = @config[:profiles][nick[:username]][:avatar] if @config[:profiles][nick[:username]].has_key?(:avatar)
+  end
+
+  return nick
+end
+
 def parse_time(data)
   return DateTime.strptime(data, "%F %T %z").to_time.utc
 end
@@ -122,23 +149,23 @@ def parse_message(data, action)
     # ignore list
     return if @config[:ignore].any? { |user| username =~ /#{user}/i }
 
-    message    = (parsed[3].nil? ? parsed[3] : CGI::escapeHTML(parsed[3].strip))
-    char_count = parsed[3].length
-    words      = parsed[3].downcase.split(" ")
+    message = parsed[3].gsub(/[^\d\w\s]/, "")
+    return if message.empty?
+
+    char_count = message.length
+    words      = message.downcase.split(/\s+/)
 
     # All time stats
     day = timestamp.strftime("%F")
     day_sym = day.to_sym
 
+    # create user if none exists
     if !@database[:users].find{ |h| h[:username] == username }
       @database[:users] << new_user(username, unix_timestamp)
     end
-
     nick = @database[:users].find{ |h| h[:username] == username }
 
-    nick[:first_seen] = unix_timestamp if nick[:first_seen] > unix_timestamp
-    nick[:last_seen]  = unix_timestamp if nick[:last_seen] < unix_timestamp
-
+    # Update words/lines/characters
     nick[:line_count] += 1
     nick[:word_count] += words.length
     nick[:char_count] += char_count
@@ -158,7 +185,10 @@ def parse_message(data, action)
     @database[:hours][timestamp.hour] += 1
     nick[:hours][timestamp.hour] += 1
 
-    # Set ends
+    # Set first and last message dates
+    nick[:first_seen] = unix_timestamp if nick[:first_seen] > unix_timestamp
+    nick[:last_seen]  = unix_timestamp if nick[:last_seen] < unix_timestamp
+
     @database[:channel][:first] = unix_timestamp if @database[:channel][:first].nil?
     @database[:channel][:last]  = unix_timestamp if @database[:channel][:last].nil?
 
@@ -217,63 +247,36 @@ else
   end
 end
 
+# Sort users by word count
 @database[:users].sort_by!{ |v| -v[:word_count] }
 @database[:active_users].sort_by!{ |v| -v[:word_count] }
 
 @database[:channel][:user_count] = @database[:users].length
 @database[:channel][:active_user_count] = @database[:active_users].length
 
+# Get average lines/day
 daily_lines = Array.new
 @database[:days].each do |day, lines|
   daily_lines << lines
 end
 @database[:channel][:mean] = daily_lines.mean
 
-def clean_user(nick)
-  nick[:words] = nick[:words].flatten.uniq
-
-  nick[:words].each { |word| word.gsub!(/[^\d\w]/, "") }
-  nick[:words].reject!{ |word| word.start_with?("http") }
-
-  nick[:words].uniq!
-  nick[:vocabulary] = nick[:words].length
-
-  nick[:days_total]  = nick[:days].length
-  nick[:words_line]  = nick[:word_count]/nick[:line_count].to_f
-  nick[:line_length] = nick[:char_count]/nick[:line_count].to_f
-  nick[:lines_day]   = nick[:line_count]/nick[:days_total].to_f
-  nick[:words_day]   = nick[:word_count]/nick[:days_total].to_f
-  nick[:max_day]     = largest_hash_key(nick[:days])
-
-  return nick if @config[:profiles].nil?
-
-  if @config[:profiles].has_key?(nick[:username])
-    nick[:url] = @config[:profiles][nick[:username]][:url] if @config[:profiles][nick[:username]].has_key?(:url)
-    nick[:avatar] = @config[:profiles][nick[:username]][:avatar] if @config[:profiles][nick[:username]].has_key?(:avatar)
-  end
-
-  return nick
-end
-
+# Clean up junk
 @database[:users].each do |nick|
   nick = clean_user(nick)
 end
-
 @database[:active_users].each do |nick|
   nick = clean_user(nick)
 end
 
+# Peak activity
 max_day = largest_hash_key(@database[:days])
 @database[:channel][:max_day] = {:day => max_day[0], :lines => max_day[1]}
-@database[:generated] = @database[:channel][:last]
 
+# Save database
+@database[:generated] = @database[:channel][:last]
 File.write(@config[:database_location], JSON.pretty_generate(@database))
 
-if @config[:heatmap_scale].nil?
-  @day_scale = 100
-else 
-  @day_scale = @config[:heatmap_scale]
-end
 
 @hours_max = @database[:hours].max
 @days   = Array.new
@@ -291,6 +294,7 @@ week_last = nil
 week_lines = 0
 @weeks_max = 0
 
+# Day heatmap
 first_day.upto(last_day) do |date|
   week_first = date.strftime("%b %e") if week_first.nil?
   date_f = date.strftime("%F")
@@ -310,15 +314,15 @@ first_day.upto(last_day) do |date|
   @weekdays[date.wday] += lines
 
   case
-  when lines < @day_scale
+  when lines < @config[:heatmap_scale]
     css_class = "scale-1"
-  when lines < @day_scale * 2
+  when lines < @config[:heatmap_scale] * 2
     css_class = "scale-2"
-  when lines < @day_scale * 3
+  when lines < @config[:heatmap_scale] * 3
     css_class = "scale-3"
-  when lines < @day_scale * 4
+  when lines < @config[:heatmap_scale] * 4
     css_class = "scale-4"
-  when lines < @day_scale * 5
+  when lines < @config[:heatmap_scale] * 5
     css_class = "scale-5"
   else 
     css_class = "scale-6"
@@ -335,6 +339,7 @@ first_day.upto(last_day) do |date|
   end
 end
 
+# Week graph
 weeks = Array.new
 @weeks.each do |week|
   lines = week[:lines]
@@ -351,7 +356,7 @@ end
 @active_users = @database[:active_users][0..9]
 @top_users = @database[:users][0..9]
 
+# Generate html
 template = ERB.new(File.read("#{directory}/stats.erb"), nil, "-")
 html_content = template.result(binding)
-
 File.write(@config[:save_location], html_content)
