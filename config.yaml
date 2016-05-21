@@ -3,9 +3,6 @@
 # or: /home/Alice/irc/logs/directory
 :location: "/home/Alice/irc/logs/#channel.log"
 
-# Is this a directory? yes/no
-:directory: no
-
 # Full path to generated .html file
 # eg: /var/www/example.com/stats.html
 :save_location: 

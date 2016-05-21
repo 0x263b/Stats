@@ -194,10 +194,6 @@ if !@config.has_key?(:location) or @config[:location].nil?
   abort("please specify a log location")
 end
 
-if !@config.has_key?(:directory) or @config[:directory].nil?
-  @config[:directory] = false
-end
-
 if !@config.has_key?(:database_location) or @config[:database_location].nil?
   @config[:database_location] = "#{directory}/database.json"
 end
@@ -259,7 +255,7 @@ else
 end
 
 # Begin
-if @config[:directory]
+if File.directory?(@config[:location])
   Dir.glob("#{@config[:location]}/**/*") do |file|
     next if file.start_with?(".")
     next unless File.file?(file)
