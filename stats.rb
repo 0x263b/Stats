@@ -9,30 +9,6 @@ require 'json'
 require 'yaml'
 require 'erb'
 
-config = ARGV.first
-directory = File.expand_path(File.dirname(__FILE__))
-
-if config.nil?
-  @config = YAML.load_file("#{directory}/config.yaml")
-else
-  @config = YAML.load_file("#{directory}/#{config}")
-end
-
-if @config[:database_location].nil?
-  @config[:database_location] = "#{directory}/database.json"
-end
-
-if @config[:save_location].nil?
-  @config[:save_location] = "#{directory}/stats.html"
-end
-
-if @config[:heatmap_scale].nil?
-  @config[:heatmap_scale] = 100
-end
-
-now = Date.today
-@ten_weeks_ago = (now - 70).to_time.utc
-
 class Array
   def sum
     inject(0.0) { |result, el| result + el }
@@ -49,36 +25,6 @@ end
 
 def add_commas(number)
   return number.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
-end
-
-@correct_user = Hash.new
-if !@config[:correct].nil?
-  @config[:correct].each do |key, value|
-    value.each do |v|
-      @correct_user[v] = key
-    end
-  end
-end
-
-if File.file?(@config[:database_location])
-  @database = JSON.parse(File.read(@config[:database_location]), {:symbolize_names => true})
-else
-  @database = Hash.new
-  @database[:generated] = 0
-  @database[:channel] = {
-    :user_count => 0,
-    :active_user_count => 0,
-    :line_count => 0,
-    :word_count => 0,
-    :max_day    => nil,
-    :mean       => 0,
-    :first      => nil,
-    :last       => nil
-  }
-  @database[:active_users] = Array.new
-  @database[:users] = Array.new
-  @database[:hours] = Array.new(24, 0)
-  @database[:days]  = Hash.new
 end
 
 def new_user(nick, timestamp)
@@ -231,6 +177,87 @@ def iterate_lines(line)
   end
 end
 
+now = Date.today
+@ten_weeks_ago = (now - 70).to_time.utc
+
+# Parse config
+config = ARGV.first
+directory = File.expand_path(File.dirname(__FILE__))
+
+if config.nil?
+  @config = YAML.load_file("#{directory}/config.yaml")
+else
+  @config = YAML.load_file("#{directory}/#{config}")
+end
+
+if !@config.has_key?(:location) or @config[:location].nil?
+  abort("please specify a log location")
+end
+
+if !@config.has_key?(:directory) or @config[:directory].nil?
+  @config[:directory] = false
+end
+
+if !@config.has_key?(:database_location) or @config[:database_location].nil?
+  @config[:database_location] = "#{directory}/database.json"
+end
+
+if !@config.has_key?(:save_location) or @config[:save_location].nil?
+  @config[:save_location] = "#{directory}/stats.html"
+end
+
+if !@config.has_key?(:title) or @config[:title].nil?
+  @config[:title] = ""
+end
+
+if !@config.has_key?(:description) or @config[:description].nil?
+  @config[:description] = ""
+end
+
+if !@config.has_key?(:heatmap_scale) or @config[:heatmap_scale].nil?
+  @config[:heatmap_scale] = 100
+end
+
+if !@config.has_key?(:ignore)
+  @config[:ignore] = Array.new
+end
+if !@config.has_key?(:correct)
+  @config[:correct] = nil
+end
+if !@config.has_key?(:profiles)
+  @config[:profiles] = nil
+end
+
+@correct_user = Hash.new
+if !@config[:correct].nil?
+  @config[:correct].each do |key, value|
+    value.each do |v|
+      @correct_user[v] = key
+    end
+  end
+end
+
+if File.file?(@config[:database_location])
+  @database = JSON.parse(File.read(@config[:database_location]), {:symbolize_names => true})
+else
+  @database = Hash.new
+  @database[:generated] = 0
+  @database[:channel] = {
+    :user_count => 0,
+    :active_user_count => 0,
+    :line_count => 0,
+    :word_count => 0,
+    :max_day    => nil,
+    :mean       => 0,
+    :first      => nil,
+    :last       => nil
+  }
+  @database[:active_users] = Array.new
+  @database[:users] = Array.new
+  @database[:hours] = Array.new(24, 0)
+  @database[:days]  = Hash.new
+end
+
 # Begin
 if @config[:directory]
   Dir.glob("#{@config[:location]}/**/*") do |file|
@@ -279,13 +306,13 @@ File.write(@config[:database_location], JSON.pretty_generate(@database))
 
 
 @hours_max = @database[:hours].max
-@days   = Array.new
-@weeks  = Array.new
+@days = Array.new
+@weeks = Array.new
 @weekdays = Array.new(7, 0) 
 @labels = Array.new
 
 first_day = Time.at(@database[:channel][:first]).utc.to_datetime
-last_day  = Time.at(@database[:channel][:last]).utc.to_datetime
+last_day = Time.at(@database[:channel][:last]).utc.to_datetime
 @total_days = (last_day - first_day).to_i
 
 x = 0
