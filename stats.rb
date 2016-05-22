@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
+
+# Ignore the shell environment and force utf-8
+# since people rarely set the environment in crontab
 Encoding.default_external = "UTF-8"
 Encoding.default_internal = "UTF-8"
 
@@ -9,24 +12,30 @@ require 'json'
 require 'yaml'
 require 'erb'
 
+# add .sum and .mean methods to Array
 class Array
+  # [1, 2, 3].sum => 6.0
   def sum
     inject(0.0) { |result, el| result + el }
   end
-
+  # [1, 2, 3].mean => 2.0
   def mean 
     sum / size
   end
 end
 
+# returns the hash k/v with the largest value
 def largest_hash_key(hash)
   hash.max_by{|k,v| v}
 end
 
+# adds commas to integers
+# add_commas(12345) => 12,345
 def add_commas(number)
   return number.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
 end
 
+# default user values
 def new_user(nick, timestamp)
   return { 
     :username    => nick,
@@ -35,12 +44,12 @@ def new_user(nick, timestamp)
     :line_count  => 0,
     :word_count  => 0,
     :char_count  => 0,
-    :words_line  => 0,
-    :line_length => 0,
-    :lines_day   => 0,
-    :words_day   => 0,
-    :vocabulary  => 0,
-    :days_total  => 0,
+    :words_line  => nil,
+    :line_length => nil,
+    :lines_day   => nil,
+    :words_day   => nil,
+    :vocabulary  => nil,
+    :days_total  => nil,
     :first_seen  => timestamp,
     :last_seen   => timestamp,
     :max_day     => nil,
@@ -50,8 +59,10 @@ def new_user(nick, timestamp)
   }
 end
 
+# clean fields from user and calculate totals/averages
 def clean_user(nick)
   nick[:words] = nick[:words].flatten.uniq
+  # delete urls
   nick[:words].reject!{ |word| word.start_with?("http") }
   nick[:words].uniq!
 
@@ -73,6 +84,7 @@ def clean_user(nick)
   return nick
 end
 
+# return a date object in UTC
 def parse_time(data)
   return DateTime.strptime(data, "%F %T %z").to_time.utc
 end
@@ -167,7 +179,9 @@ def parse_message(data, action)
 end
 
 def iterate_lines(line)
+  # [2006-01-02 15:04:05 -0700] <joebloggs> This is a message
   message = /^\[(.+)\] <(\S+)> (.+)/i
+  # [2006-01-02 15:04:05 -0700] * joebloggs is preforming an action
   action  = /^\[(.+)\] \* (\S+) (.+)/i
 
   if line =~ action
@@ -177,6 +191,7 @@ def iterate_lines(line)
   end
 end
 
+# Active users defined as people who spoke in the past 10 weeks (70 days)
 now = Date.today
 @ten_weeks_ago = (now - 70).to_time.utc
 
@@ -224,6 +239,7 @@ if !@config.has_key?(:profiles)
   @config[:profiles] = nil
 end
 
+# Create a hash for username corrections
 @correct_user = Hash.new
 if !@config[:correct].nil?
   @config[:correct].each do |key, value|
@@ -234,8 +250,10 @@ if !@config[:correct].nil?
 end
 
 if File.file?(@config[:database_location])
+  # Read from a database if one exists
   @database = JSON.parse(File.read(@config[:database_location]), {:symbolize_names => true})
 else
+  # Generate a new database
   @database = Hash.new
   @database[:generated] = 0
   @database[:channel] = {
@@ -256,9 +274,13 @@ end
 
 # Begin
 if File.directory?(@config[:location])
+  # If we're given a directory of log files
   Dir.glob("#{@config[:location]}/**/*") do |file|
+    # Skip hidden files
     next if file.start_with?(".")
+    # Skip directories
     next unless File.file?(file)
+    # Skip files that haven't been updated since last execution
     next if File.mtime(file).to_i < @database[:generated]
 
     File.open(file).each_line do |line|
@@ -301,7 +323,7 @@ max_day = largest_hash_key(@database[:days])
 @database[:generated] = @database[:channel][:last]
 File.write(@config[:database_location], JSON.pretty_generate(@database))
 
-
+# initialize variables for stats.erb
 @hours_max = @database[:hours].max
 @days = Array.new
 @weeks = Array.new
@@ -321,7 +343,7 @@ week_lines = 0
 # Day heatmap
 first_day.upto(last_day) do |date|
   week_first = date.strftime("%b %e") if week_first.nil?
-  date_f = date.strftime("%F")
+  date_f = date.strftime("%F") # 2015-05-21
 
   y = date.wday
   if y == 0
@@ -332,7 +354,7 @@ first_day.upto(last_day) do |date|
 
   lines = @database[:days][date_f.to_sym] || 0
   week_lines += lines
-  week_last = date.strftime("%b %e")
+  week_last = date.strftime("%b %e") # May 21
 
   @weeks[x] = {:x => x, :lines => week_lines, :first => week_first, :last => week_last}
   @weekdays[date.wday] += lines
@@ -352,12 +374,16 @@ first_day.upto(last_day) do |date|
     css_class = "scale-6"
   end
 
+  # x = week
+  # y = weekday
+  # date = Sat, May 21
   @days << {:x => x, :y => y, :date => date.strftime("%a, %b %e"), :class => css_class, :lines => lines}
 
+  # April, July, October
   if [92, 183, 274].include?(date.yday)
     @labels << {:x => x, :month => date.strftime("%B") }
   end
-
+  # Happy New Year!
   if date.yday == 1
     @labels << {:x => x, :month => date.year }
   end
@@ -377,6 +403,7 @@ end
 @weeks_mean = weeks.mean
 @weekdays_max = @weekdays.max
 
+# Grab the top 10 users
 @active_users = @database[:active_users][0..9]
 @top_users = @database[:users][0..9]
 
@@ -384,3 +411,5 @@ end
 template = ERB.new(File.read("#{directory}/stats.erb"), nil, "-")
 html_content = template.result(binding)
 File.write(@config[:save_location], html_content)
+
+# Fin

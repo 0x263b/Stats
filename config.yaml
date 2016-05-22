@@ -1,5 +1,5 @@
 # Full path to your log file or directory (mandatory)
-:location: "/home/Alice/irc/logs/#channel.log"
+:location:
 
 # Full path to generated .html file
 :save_location: 
