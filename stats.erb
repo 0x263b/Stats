@@ -85,7 +85,7 @@ p {
 	font-size: 30px;
 	font-weight: 300;
 	-webkit-box-flex: 1;
-	        flex-grow: 1;
+			flex-grow: 1;
 	text-align: center;
 }
 
@@ -94,7 +94,7 @@ p {
 	.activity-numbers div {
 		min-width: 140px;
 		-webkit-box-flex: 1;
-		        flex: 1 1 0;
+				flex: 1 1 0;
 		-webkit-flex: 1 1 auto;
 	}
 }
@@ -111,7 +111,7 @@ p {
 text {
 	font-size: 12px;
 }
-rect:hover {
+.chart rect:hover {
 	fill: #00d1fd;
 }
 .scale-1 {
@@ -175,9 +175,6 @@ rect:hover {
 	overflow-x: auto;
 	text-align: center;
 }
-.chart::-webkit-scrollbar {
-	display: none;
-}
 #charts .hover {
 	position: absolute;
 	top: 228px;
@@ -212,17 +209,35 @@ rect:hover {
 #hourly .lines {
 	text-align: right;
 	-webkit-box-flex: 1;
-	        flex-grow: 1;
+			flex-grow: 1;
 }
 #active-users,#top-users {
 	border-spacing: 0;
 	width: 100%;
 }
+
+#user-hours {
+	display: -webkit-box;
+	display: flex;
+	flex-flow: row wrap;
+	-webkit-box-pack: center;
+	        justify-content: center;
+}
+#user-hours > div {
+	min-width: 120px;
+	margin: 10px 10px 30px;
+}
+#user-hours svg {
+	margin-top: 10px;
+}
+
 table {
 	margin-bottom: 50px;
 }
+td, th {
+	text-align: right;	
+}
 th {
-	text-align: right;
 	text-transform: uppercase;
 	font-size: 12px;
 	font-weight: 500;
@@ -236,17 +251,17 @@ td {
 td:first-child {
 	font-size: 20px;
 	font-weight: 300;
-}
-td:not(:first-child) {
-	text-align: right;
+	text-align: left;
 }
 td img {
 	width: 45px;
 	height: 45px;
 	background-color: #aaa;
 	border-radius: 4px;
-	vertical-align: middle;
 	margin-right: 15px;
+}
+td img,td svg {
+	vertical-align: middle;
 }
 
 @media (max-width: 500px) {
@@ -263,6 +278,78 @@ td img {
 		height: 25px;
 	}
 }
+#user-hours img {
+	width: 20px;
+	height: 20px;
+	background-color: #aaa;
+	border-radius: 4px;
+	vertical-align: middle;
+	margin-right: 10px;
+}
+.stacked-chart {
+	display: -webkit-box;
+	display: flex;
+	height: 40px;
+}
+.stacked-chart div:nth-child(1) { background-color: #c56edd }
+.stacked-chart div:nth-child(2) { background-color: #825db8 }
+.stacked-chart div:nth-child(3) { background-color: #534e94 }
+.stacked-chart div:nth-child(4) { background-color: #4e5f73 }
+.stacked-chart div:nth-child(5) { background-color: #8495ab }
+.stacked-chart div:last-child { background-color: #c2d0de; -webkit-box-flex: 1; flex-grow: 1; }
+
+#activity-percentage ol {
+	padding: 0;
+	margin: 50px auto;
+	width: 200px;
+}
+#activity-percentage li {
+	font-size: 16px;
+	font-weight: 300;
+	padding: 5px 0;
+	list-style: none;
+}
+#activity-percentage strong {
+	font-size: 14px;
+	font-weight: 500;
+}
+#activity-percentage img {
+	width: 25px;
+	height: 25px;
+	background-color: #aaa;
+	border-radius: 4px;
+	vertical-align: middle;
+	margin-right: 10px;
+}
+#months {
+	display: -webkit-box;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	        flex-direction: row;
+	-webkit-box-pack: center;
+	        justify-content: center;
+}
+.months-chart {
+	overflow-x: auto;
+	text-align: right;
+}
+.months-users {
+	flex-shrink: 0;
+}
+#months ol {
+	padding: 26px 0 0;
+	margin: 0;
+}
+#months li {
+	list-style: none;
+	line-height: 25px;
+}
+#months img {
+	width: 20px;
+	height: 20px;
+	border-radius: 2px;
+	vertical-align
 </style>
 </head>
 <body id="body">
@@ -287,7 +374,7 @@ td img {
 		<svg width="<%= (@days.last[:x] * 10) + 10 %>px" height="275px" version="1.1" 
 			xmlns="http://www.w3.org/2000/svg" 
 			xmlns:xlink="http://www.w3.org/1999/xlink"
-			xmlns:data="http://www.examples.com/data">
+			xmlns:data="http://www.example.com/data">
 			<g id="weeks" stroke="none" stroke-width="1" fill="#8495ab" transform="translate(0,110) scale(1,-1)">
 				<% @weeks.each do |week| -%>
 <rect x="<%= week[:x] * 10 %>" y="0" width="9" height="<%= ((week[:lines].to_f / @weeks_max) * 100).round %>" data:lines="<%= week[:lines] %>" data:first="<%= week[:first] %>" data:last="<%= week[:last] %>"></rect>
@@ -333,7 +420,7 @@ td img {
 		<svg width="340px" height="170px" version="1.1" 
 			xmlns="http://www.w3.org/2000/svg" 
 			xmlns:xlink="http://www.w3.org/1999/xlink"
-			xmlns:data="http://www.examples.com/data">
+			xmlns:data="http://www.example.com/data">
 			<g id="hours" stroke="none" stroke-width="1" fill="#8495ab" transform="translate(0,100) scale(1,-1)">
 				<% @database[:hours].each_with_index do |hour, index| -%>
 <rect x="<%= index * 10 %>" y="0" width="9" height="<%= ((hour.to_f / @hours_max) * 100).round %>"></rect>
@@ -381,8 +468,8 @@ td img {
 	<tr>
 		<th></th>
 		<th>Words</th>
-		<th>Vocabulary</th>
 		<th>Words/day</th>
+		<th>Days Active</th>	
 		<th>Last spoke</th>
 	</tr>
 	</thead>
@@ -391,13 +478,15 @@ td img {
 	<tr>
 		<td data="<%= user[:username] %>"><a href="<%= user[:url] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a></td>
 		<td data="<%= user[:word_count] %>"><%= add_commas(user[:word_count]) %></td>
-		<td data="<%= user[:vocabulary] %>"><%= add_commas(user[:vocabulary]) %></td>
 		<td data="<%= user[:words_day].round %>"><%= add_commas(user[:words_day].round) %></td>
+		<td data="<%= user[:days_active] %>"><%= user[:days_active] %></td>
 		<td class="date" data="<%= user[:last_seen] %>"><%= Time.at(user[:last_seen]).utc.to_datetime.strftime("%a, %b %e") %></td>
 	</tr>
 	<% end %>
 	</tbody>
 </table>
+
+<hr>
 
 <h2>Top Users</h2>
 <table id="top-users">
@@ -412,7 +501,7 @@ td img {
 	</thead>
 	<tbody>
 	<% @top_users.each do |user| %>
-	<tr>
+	<tr id="<%= user[:username] %>">
 		<td data="<%= user[:username] %>"><a href="<%= user[:url] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a></td>
 		<td data="<%= user[:word_count] %>"><%= add_commas(user[:word_count]) %></td>
 		<td data="<%= user[:vocabulary] %>"><%= add_commas(user[:vocabulary]) %></td>
@@ -422,6 +511,78 @@ td img {
 	<% end %>
 	</tbody>
 </table>
+
+<h2>Time of Day</h2>
+<div id="user-hours">
+<% @top_users.each do |user| %>
+	<div>
+		<div><a href="#<%= user[:username] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a></div>
+		<svg width="120px" height="42px" version="1.1" 
+			xmlns="http://www.w3.org/2000/svg" 
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			xmlns:data="http://www.example.com/data">
+			<g id="hours-<%= user[:username] %>" class="user-hours" data:hours="<%= user[:hours] %>" stroke="none" stroke-width="1" fill="#ddd" transform="translate(0,40) scale(1,-1)">
+				<% user[:hours].each_with_index do |hour, index| -%>
+<rect x="<%= index * 5 %>" y="0" width="4" height="<%= ((hour.to_f / user[:max_hour]) * 40).round %>"></rect>
+				<% end -%>
+			</g>
+			<line x1="0" y1="41.5" x2="119" y2="41.5" stroke="#ddd" stroke-width="1" >
+		</svg>
+	</div>
+<% end -%>
+</div>
+
+<h2>Share of Activity</h2>
+<div id="activity-percentage">
+	<div class="stacked-chart">
+		<% @top_users.first(5).each do |user| -%>
+			<div title="<%= user[:username] %>" style="width:<%= (user[:word_count].to_f/@database[:channel][:word_count] * 100).round(2) -%>%"></div>
+		<% end -%>
+			<div class="last"></div>
+	</div>
+	<ol>
+	<% @top_users.first(5).each do |user| -%>
+		<li>
+			<a href="#<%= user[:username] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a>
+			<strong><%= (user[:word_count].to_f/@database[:channel][:word_count] * 100).round -%>%</strong>
+		</li>
+	<% end -%>
+	</ol>
+</div>
+
+<h2>Activity Over Time</h2>
+<div id="months">
+	<div class="months-chart">
+		<svg width="<%= @month_count * 22 + 20 %>px" height="280px" version="1.1" 
+			xmlns="http://www.w3.org/2000/svg" 
+			xmlns:xlink="http://www.w3.org/1999/xlink"
+			xmlns:data="http://www.example.com/data">
+			<g id="month-labels" fill="#999" transform="translate(20,20)">
+			<% @mlabels.each do |label| %>
+				<text x="<%= (label[:x] * 22) %>" y="0" text-anchor="middle"><%= label[:month] %></text>
+			<% end -%>
+			</g>
+
+		<% @top_users.each_with_index do |user, index| %>
+			<g id="months-<%= user[:username] %>" transform="translate(20,<%= 40 + index * 25 %>)" fill="#ddd">
+			<% user[:months].each_with_index do |words, index| %>
+				<circle cy="0" cx="<%= index * 22 %>" r="<%= (words.to_f/user[:month_max] * 10).ceil %>" />
+			<% end -%>
+			</g>
+		<% end -%>
+		</svg>
+	</div>
+	<div class="months-users">
+		<ol>
+		<% @top_users.each do |user| %>
+			<li><a href="#<%= user[:username] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a></li>
+		<% end -%>
+		</ol>
+	</div>
+</div>
+
+<hr>
+
 </main>
 <script>
 "use strict"
@@ -429,6 +590,10 @@ td img {
 // Scroll chart to the left if it overflows
 var element = document.querySelector("#charts .chart")
 element.scrollLeft = element.scrollWidth
+
+var element = document.querySelector("#months .months-chart")
+element.scrollLeft = element.scrollWidth
+
 
 // myArray.pushArray([1, 2, 3], [4, 5 ,6]) → [1, 2, 3, 4, 5, 6]
 Array.prototype.pushArray = function() {
@@ -482,7 +647,7 @@ var local_zone = local_time.getTimezoneOffset()/60
 var timezone_label = (local_zone > 0) ? "GMT–" + local_zone : "GMT+" + Math.abs(local_zone)
 document.querySelector(".timezone-label").innerHTML = timezone_label
 
-function parseHours(array, selector){
+function parseHours(array, selector, h, i ,w){
 	var node = document.querySelector(selector)
 
 	// Empty the original SVG
@@ -500,14 +665,14 @@ function parseHours(array, selector){
 
 	// Add new elements
 	adjusted_hours.forEach(function(lines, index){
-		var height = Math.round((lines/max_lines) * 100)
-		var x = index * 10
+		var height = Math.round((lines/max_lines) * h)
+		var x = index * i
 
 		var rect = document.createElementNS(svgns, 'rect')
 			rect.setAttributeNS(null, 'x', x)
 			rect.setAttributeNS(null, 'y', '0')
 			rect.setAttributeNS(null, 'height', height)
-			rect.setAttributeNS(null, 'width',  '9')
+			rect.setAttributeNS(null, 'width',  w)
 			rect.setAttributeNS("http://www.examples.com/data", 'data:lines',  lines)
 
 		node.appendChild(rect)
@@ -571,7 +736,7 @@ function makeAllSortable() {
 	}
 }
 
-// Format last seen dates
+// Format last seen dates => Sat, May 21
 function formatDate(timestamp) {
 	var shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 		shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -591,8 +756,19 @@ function formatAllDates() {
 	}
 }
 
+function parseAllHours() {
+	var nodes = document.querySelectorAll('.user-hours')
+	for (var i = 0; i < nodes.length; ++i) {
+		var hours = nodes[i].getAttribute("data:hours")
+		var id = nodes[i].getAttribute("id")
+		parseHours(JSON.parse(hours), '#'+id, 40, 5, 4)
+	}
+}
+
+
 (function(){
-	parseHours(<%= @database[:hours] %>, "#hours")
+	parseHours(<%= @database[:hours] %>, "#hours", 100, 10, 9)
+	parseAllHours()
 	makeAllSortable()
 	formatAllDates()
 

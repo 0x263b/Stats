@@ -52,7 +52,7 @@ def new_user(nick, timestamp)
     :days_total  => nil,
     :first_seen  => timestamp,
     :last_seen   => timestamp,
-    :max_day     => nil,
+    :max_hour    => nil,
     :hours       => Array.new(24, 0),
     :days        => Hash.new,
     :words       => Array.new
@@ -72,7 +72,7 @@ def clean_user(nick)
   nick[:line_length] = nick[:char_count]/nick[:line_count].to_f
   nick[:lines_day]   = nick[:line_count]/nick[:days_total].to_f
   nick[:words_day]   = nick[:word_count]/nick[:days_total].to_f
-  nick[:max_day]     = largest_hash_key(nick[:days])
+  nick[:max_hour]    = nick[:hours].max
 
   return nick if @config[:profiles].nil?
 
@@ -117,6 +117,9 @@ def parse_message(data, action)
     day = timestamp.strftime("%F")
     day_sym = day.to_sym
 
+    month = timestamp.strftime("%Y-%m")
+    month_sym = month.to_sym
+
     # create user if none exists
     if !@database[:users].find{ |h| h[:username] == username }
       @database[:users] << new_user(username, unix_timestamp)
@@ -132,16 +135,16 @@ def parse_message(data, action)
     @database[:channel][:line_count] += 1
     @database[:channel][:word_count] += words.length
 
-    # Days
-    nick[:days][day_sym] = 0 unless nick[:days].has_key?(day_sym)
-    nick[:days][day_sym] += 1
-
-    @database[:days][day_sym] = 0 unless @database[:days].has_key?(day_sym)
-    @database[:days][day_sym] += 1
-
     # Hours
     @database[:hours][timestamp.hour] += 1
     nick[:hours][timestamp.hour] += 1
+
+    # Days
+    nick[:days][day_sym] = 0 unless nick[:days].has_key?(day_sym)
+    nick[:days][day_sym] += words.length
+
+    @database[:days][day_sym] = 0 unless @database[:days].has_key?(day_sym)
+    @database[:days][day_sym] += 1
 
     # Set first and last message dates
     nick[:first_seen] = unix_timestamp if nick[:first_seen] > unix_timestamp
@@ -152,27 +155,6 @@ def parse_message(data, action)
 
     @database[:channel][:first] = unix_timestamp if @database[:channel][:first] > unix_timestamp 
     @database[:channel][:last]  = unix_timestamp if @database[:channel][:last] < unix_timestamp
-
-    # Active stats
-    return if timestamp < @ten_weeks_ago
-
-    if !@database[:active_users].find{ |h| h[:username] == username }
-      @database[:active_users] << new_user(username, unix_timestamp)
-    end
-    nick = @database[:active_users].find{ |h| h[:username] == username }
-
-    nick[:first_seen] = unix_timestamp if nick[:first_seen] > unix_timestamp
-    nick[:last_seen]  = unix_timestamp if nick[:last_seen] < unix_timestamp
-
-    nick[:line_count] += 1
-    nick[:word_count] += words.length
-    nick[:char_count] += char_count
-    nick[:words] << words
-
-    nick[:days][day_sym] = 0 unless nick[:days].has_key?(day_sym)
-    nick[:days][day_sym] += 1
-
-    nick[:hours][timestamp.hour] += 1
   rescue
     puts data
   end
@@ -190,10 +172,6 @@ def iterate_lines(line)
     parse_message(line, false)
   end
 end
-
-# Active users defined as people who spoke in the past 10 weeks (70 days)
-now = Date.today
-@ten_weeks_ago = (now - 70).to_time.utc
 
 # Parse config
 config = ARGV.first
@@ -252,13 +230,13 @@ end
 if File.file?(@config[:database_location])
   # Read from a database if one exists
   @database = JSON.parse(File.read(@config[:database_location]), {:symbolize_names => true})
+  @database[:active_users] = Array.new
 else
   # Generate a new database
   @database = Hash.new
   @database[:generated] = 0
   @database[:channel] = {
     :user_count => 0,
-    :active_user_count => 0,
     :line_count => 0,
     :word_count => 0,
     :max_day    => nil,
@@ -293,12 +271,15 @@ else
   end
 end
 
+# Alpha and Omega
+first_day = Time.at(@database[:channel][:first]).utc.to_datetime
+last_day = Time.at(@database[:channel][:last]).utc.to_datetime
+now = Date.today
+ten_weeks_ago = (now - 70).to_datetime
+
 # Sort users by word count
 @database[:users].sort_by!{ |v| -v[:word_count] }
-@database[:active_users].sort_by!{ |v| -v[:word_count] }
-
 @database[:channel][:user_count] = @database[:users].length
-@database[:channel][:active_user_count] = @database[:active_users].length
 
 # Get average lines/day
 daily_lines = Array.new
@@ -311,17 +292,52 @@ end
 @database[:users].each do |nick|
   nick = clean_user(nick)
 end
-@database[:active_users].each do |nick|
-  nick = clean_user(nick)
+
+# Find activity trends
+@database[:users][0..9].each do |user|
+  user[:months] = Array.new(1, 0)
+  x = 0
+  first_day.upto(last_day) do |date|
+    if date.mday == 1
+      x += 1
+      user[:months][x] = 0
+    end
+    if !user[:days][date.strftime("%F").to_sym].nil?
+      user[:months][x] += user[:days][date.strftime("%F").to_sym]
+    end
+  end
 end
+
+# Find active users
+@database[:users].each do |user|
+  word_count = 0
+  days_active = 0
+  # Gather activity from the past 10 weeks
+  ten_weeks_ago.upto(last_day) do |date|
+    date_f = date.strftime("%F").to_sym
+    if user[:days].has_key?(date_f)
+      word_count += user[:days][date_f]
+      days_active += 1
+    end
+  end
+  @database[:active_users] << {
+    :username    => user[:username],
+    :avatar      => user[:avatar],
+    :url         => user[:url],
+    :word_count  => word_count,
+    :days_active => days_active,
+    :words_day   => word_count.to_f/days_active,
+    :last_seen   => user[:last_seen],
+  }
+end
+# Purge the silent
+@database[:active_users].delete_if{ |user| user[:days_active] == 0 }
+# Sort by most vocal
+@database[:active_users].sort_by!{ |v| -v[:word_count] }
 
 # Peak activity
 max_day = largest_hash_key(@database[:days])
 @database[:channel][:max_day] = {:day => max_day[0], :lines => max_day[1]}
-
-# Save database
-@database[:generated] = @database[:channel][:last]
-File.write(@config[:database_location], JSON.pretty_generate(@database))
 
 # initialize variables for stats.erb
 @hours_max = @database[:hours].max
@@ -329,12 +345,11 @@ File.write(@config[:database_location], JSON.pretty_generate(@database))
 @weeks = Array.new
 @weekdays = Array.new(7, 0) 
 @labels = Array.new
-
-first_day = Time.at(@database[:channel][:first]).utc.to_datetime
-last_day = Time.at(@database[:channel][:last]).utc.to_datetime
+@mlabels = Array.new
 @total_days = (last_day - first_day).to_i
 
 x = 0
+mx = 0
 week_first = nil
 week_last = nil
 week_lines = 0
@@ -350,6 +365,10 @@ first_day.upto(last_day) do |date|
     x += 1 
     week_lines = 0
     week_first = date.strftime("%b %e")
+  end
+
+  if date.mday == 1
+    mx += 1
   end
 
   lines = @database[:days][date_f.to_sym] || 0
@@ -382,10 +401,12 @@ first_day.upto(last_day) do |date|
   # April, July, October
   if [92, 183, 274].include?(date.yday)
     @labels << {:x => x, :month => date.strftime("%B") }
+    @mlabels << {:x => mx, :month => date.strftime("%B") }
   end
   # Happy New Year!
   if date.yday == 1
     @labels << {:x => x, :month => date.year }
+    @mlabels << {:x => mx, :month => date.year }
   end
 end
 
@@ -404,8 +425,18 @@ end
 @weekdays_max = @weekdays.max
 
 # Grab the top 10 users
-@active_users = @database[:active_users][0..9]
 @top_users = @database[:users][0..9]
+@active_users = @database[:active_users][0..9]
+
+@top_users.each do |user|
+  user[:month_max] = user[:months].max
+end
+
+@month_count = @top_users[0][:months].length
+
+# Save database
+@database[:generated] = @database[:channel][:last]
+File.write(@config[:database_location], JSON.pretty_generate(@database))
 
 # Generate html
 template = ERB.new(File.read("#{directory}/stats.erb"), nil, "-")
