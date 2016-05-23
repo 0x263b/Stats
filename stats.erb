@@ -59,20 +59,35 @@ h1,h2 {
 	text-align: center;
 }
 h2 {
+	margin: 100px 0 50px;
+}
+h4 {
+	text-align: center;
+	font-weight: normal;
+	font-size: 12px;
+	margin-top: -50px;
 	margin-bottom: 50px;
+	color: #999;
 }
 hr {
 	border: none;
 	height: 1px;
-	background-color: #eee;
+	background-color: #ddd;
 	margin: 50px auto;
-	max-width: 150px;
 }
 p {
-	max-width: 400px;
-	color: #555;
+	color: #999;
 	font-weight: 300;
+	font-size: 14px;
 	margin: auto;
+}
+header p {
+	max-width: 400px;
+	font-size: 16px;
+	color: #555;
+}
+header hr {
+	max-width: 200px;
 }
 .activity-numbers {
 	display: -webkit-box;
@@ -85,7 +100,7 @@ p {
 	font-size: 30px;
 	font-weight: 300;
 	-webkit-box-flex: 1;
-			flex-grow: 1;
+	flex-grow: 1;
 	text-align: center;
 }
 
@@ -94,7 +109,7 @@ p {
 	.activity-numbers div {
 		min-width: 140px;
 		-webkit-box-flex: 1;
-				flex: 1 1 0;
+		flex: 1 1 0;
 		-webkit-flex: 1 1 auto;
 	}
 }
@@ -209,7 +224,7 @@ text {
 #hourly .lines {
 	text-align: right;
 	-webkit-box-flex: 1;
-			flex-grow: 1;
+	flex-grow: 1;
 }
 #active-users,#top-users {
 	border-spacing: 0;
@@ -221,7 +236,7 @@ text {
 	display: flex;
 	flex-flow: row wrap;
 	-webkit-box-pack: center;
-	        justify-content: center;
+	justify-content: center;
 }
 #user-hours > div {
 	min-width: 120px;
@@ -232,7 +247,7 @@ text {
 }
 
 table {
-	margin-bottom: 50px;
+	margin-bottom: 10px;
 }
 td, th {
 	text-align: right;	
@@ -291,17 +306,34 @@ td img,td svg {
 	display: flex;
 	height: 40px;
 }
-.stacked-chart div:nth-child(1) { background-color: #c56edd }
-.stacked-chart div:nth-child(2) { background-color: #825db8 }
-.stacked-chart div:nth-child(3) { background-color: #534e94 }
-.stacked-chart div:nth-child(4) { background-color: #4e5f73 }
-.stacked-chart div:nth-child(5) { background-color: #8495ab }
-.stacked-chart div:last-child { background-color: #c2d0de; -webkit-box-flex: 1; flex-grow: 1; }
+.stacked-chart div:nth-child(1), 
+#activity-percentage li:nth-child(1) .color { background-color: #c56edd }
+.stacked-chart div:nth-child(2), 
+#activity-percentage li:nth-child(2) .color { background-color: #ad68d0 }
+.stacked-chart div:nth-child(3), 
+#activity-percentage li:nth-child(3) .color { background-color: #8d60bf }
+.stacked-chart div:nth-child(4), 
+#activity-percentage li:nth-child(4) .color { background-color: #7458af }
+.stacked-chart div:nth-child(5), 
+#activity-percentage li:nth-child(5) .color { background-color: #5e509f }
+.stacked-chart div:nth-child(6), 
+#activity-percentage li:nth-child(6) .color { background-color: #514e90 }
+.stacked-chart div:nth-child(7), 
+#activity-percentage li:nth-child(7) .color { background-color: #4e527d }
+.stacked-chart div:nth-child(8), 
+#activity-percentage li:nth-child(8) .color { background-color: #4e5c73 }
+.stacked-chart div:nth-child(9), 
+#activity-percentage li:nth-child(9) .color { background-color: #5b6e7f }
+.stacked-chart div:nth-child(10), 
+#activity-percentage li:nth-child(10) .color { background-color: #75869b }
+.stacked-chart div:last-child { background-color: #8f9fb4; -webkit-box-flex: 1; flex-grow: 1; }
 
 #activity-percentage ol {
 	padding: 0;
 	margin: 50px auto;
-	width: 200px;
+	-webkit-column-count: 2;
+	   -moz-column-count: 2;
+	        column-count: 2;
 }
 #activity-percentage li {
 	font-size: 16px;
@@ -314,13 +346,13 @@ td img,td svg {
 	font-weight: 500;
 	margin-left: 3px;
 }
-#activity-percentage img {
-	width: 25px;
-	height: 25px;
-	background-color: #aaa;
-	border-radius: 4px;
+#activity-percentage .color {
+	width: 16px;
+	height: 16px;
+	border-radius: 8px;
 	vertical-align: middle;
-	margin-right: 10px;
+	margin-right: 8px;
+	display: inline-block;
 }
 #months {
 	display: -webkit-box;
@@ -353,16 +385,29 @@ td img,td svg {
 	vertical-align: middle;
 	margin-right: 5px;
 }
+footer:before {
+	width: 60px;
+	content: '';
+	display: inline-block;
+	height: 1px;
+	margin: 0 0 13px;
+	background-color: #999;
+}
+footer {
+	font-size: 12px;
+	margin-top: 50px;
+}
 </style>
 </head>
 <body id="body">
 <script> document.getElementById("body").style.opacity = 0; </script>
 
 <main role="main">
-<h1><%= @config[:title] %></h1>
-<p><%= @config[:description] %></p>
-
-<hr>
+<header>
+	<h1><%= @config[:title] %></h1>
+	<p><%= @config[:description] %></p>
+	<hr>
+</header>
 
 <h2>Total Activity</h2>
 <div class="activity-numbers">
@@ -488,8 +533,8 @@ td img,td svg {
 	<% end %>
 	</tbody>
 </table>
+<p>An active user is someone who‘s posted at least one message in the past ten weeks.</p>
 
-<hr>
 
 <h2>Top Users</h2>
 <table id="top-users">
@@ -516,6 +561,7 @@ td img,td svg {
 </table>
 
 <h2>Time of Day</h2>
+<h4>Times in <span class="timezone-label">UTC</span></h4>
 <div id="user-hours">
 <% @top_users.each do |user| %>
 	<div>
@@ -534,24 +580,26 @@ td img,td svg {
 	</div>
 <% end -%>
 </div>
+<hr>
 
 <h2>Share of Activity</h2>
 <div id="activity-percentage">
 	<div class="stacked-chart">
-		<% @top_users.first(5).each do |user| -%>
+		<% @top_users.each do |user| -%>
 			<div title="<%= user[:username] %>" style="width:<%= (user[:word_count].to_f/@database[:channel][:word_count] * 100).round(2) -%>%"></div>
 		<% end -%>
 			<div class="last"></div>
 	</div>
 	<ol>
-	<% @top_users.first(5).each do |user| -%>
+	<% @top_users.each do |user| -%>
 		<li>
-			<a href="#<%= user[:username] %>"><img src="<%= user[:avatar] %>" alt=""><%= user[:username] %></a>
+			<a href="#<%= user[:username] %>"><span class="color"></span><%= user[:username] %></a>
 			<strong><%= (user[:word_count].to_f/@database[:channel][:word_count] * 100).round -%>%</strong>
 		</li>
 	<% end -%>
 	</ol>
 </div>
+<hr>
 
 <h2>Activity Over Time</h2>
 <div id="months">
@@ -584,8 +632,9 @@ td img,td svg {
 	</div>
 </div>
 
-<hr>
-
+<footer>
+<div>By <a href="https://kash.im">Abram Kash</a></div>
+</footer>
 </main>
 <script>
 "use strict"
@@ -601,6 +650,13 @@ element.scrollLeft = element.scrollWidth
 // myArray.pushArray([1, 2, 3], [4, 5 ,6]) → [1, 2, 3, 4, 5, 6]
 Array.prototype.pushArray = function() {
 	this.push.apply(this, this.concat.apply([], arguments))
+}
+
+// forEach method, could be shipped as part of an Object Literal/Module
+var forEach = function (array, callback, scope) {
+	for (var i = 0; i < array.length; i++) {
+		callback.call(scope, i, array[i])
+	}
 }
 
 // 1234 → 1,234
@@ -648,7 +704,10 @@ var local_time = new Date()
 var local_zone = local_time.getTimezoneOffset()/60
 
 var timezone_label = (local_zone > 0) ? "GMT–" + local_zone : "GMT+" + Math.abs(local_zone)
-document.querySelector(".timezone-label").innerHTML = timezone_label
+var timezone_labels = document.querySelectorAll(".timezone-label")
+forEach(timezone_labels, function (index, value) {
+	timezone_labels[index].innerHTML = timezone_label
+})
 
 function parseHours(array, selector, h, i ,w){
 	var node = document.querySelector(selector)
@@ -733,10 +792,10 @@ function makeSortable(table) {
 
 // Find every table
 function makeAllSortable() {
-	var t = document.getElementsByTagName('table')
-	for (var i = 0; i < t.length; ++i) {
-		makeSortable(t[i])
-	}
+	var tables = document.getElementsByTagName('table')
+	forEach(tables, function (index, value) {
+		makeSortable(tables[index])
+	})
 }
 
 // Format last seen dates => Sat, May 21
@@ -753,19 +812,19 @@ function formatDate(timestamp) {
 }
 
 function formatAllDates() {
-	var nodes = document.querySelectorAll('.date')
-	for (var i = 0; i < nodes.length; ++i) {
-		nodes[i].innerHTML = formatDate(nodes[i].getAttribute("data"))
-	}
+	var dates = document.querySelectorAll('.date')
+	forEach(dates, function (index, value) {
+		dates[index].innerHTML = formatDate(dates[index].getAttribute("data"))
+	})
 }
 
 function parseAllHours() {
 	var nodes = document.querySelectorAll('.user-hours')
-	for (var i = 0; i < nodes.length; ++i) {
-		var hours = nodes[i].getAttribute("data:hours")
-		var id = nodes[i].getAttribute("id")
+	forEach(nodes, function (index, value) {
+		var hours = nodes[index].getAttribute("data:hours")
+		var id = nodes[index].getAttribute("id")
 		parseHours(JSON.parse(hours), '#'+id, 40, 5, 4)
-	}
+	})
 }
 
 
