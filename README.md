@@ -7,6 +7,8 @@ Stats/Analytics generator for IRC and Slack channels
 * [NYCTech](https://kash.im/stats/nyctech.html) ([Slack Group](http://www.nyctechslack.com/), one channel)
 * [Spec.fm](https://kash.im/stats/spec.html) ([Slack group](http://spec.fm/), one channel)
 
+Slack provides a stats page of their own at `https://<group>.slack.com/stats` ([Example output from NYCTech](https://i.imgur.com/CUDfoPx.png))
+
 ### Usage
 
 This script assumes your logs are formatted like so
