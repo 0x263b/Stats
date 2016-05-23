@@ -412,6 +412,7 @@ end
 
 # Week graph
 weeks = Array.new
+@weeks.compact! # purge nil weeks
 @weeks.each do |week|
   lines = week[:lines]
   if lines > @weeks_max
