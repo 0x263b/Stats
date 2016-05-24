@@ -18,6 +18,8 @@ This script assumes your logs are formatted like so
 [2006-01-02 15:04:05 -0700] * joebloggs is preforming an action
 ```
 
+Take a look at [this gist](https://gist.github.com/0x263b/a296fad860edc4ea3deb7f30e0e41bc0) for how to obtain logs from Slack
+
 #### Basic usage
 
 Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. This will create a `database.json` and `stats.html` in the script directoy.
