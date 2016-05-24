@@ -18,7 +18,9 @@ This script assumes your logs are formatted like so
 [2006-01-02 15:04:05 -0700] * joebloggs is preforming an action
 ```
 
-Take a look at [this gist](https://gist.github.com/0x263b/a296fad860edc4ea3deb7f30e0e41bc0) for how to obtain logs from Slack
+Take a look at [this gist](https://gist.github.com/0x263b/a296fad860edc4ea3deb7f30e0e41bc0) for how to obtain logs from Slack.
+
+Note: This script works best if you split your logs into multiple files. ex: `#channel/YYYY-MM.log`
 
 #### Basic usage
 
