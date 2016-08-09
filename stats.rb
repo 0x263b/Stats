@@ -107,7 +107,7 @@ def parse_message(data, action)
     # ignore list
     return if @config[:ignore].any? { |user| username =~ /#{user}/i }
 
-    message = parsed[3].gsub(/[^\d\w\s]/, "")
+    message = parsed[3].gsub(/[^\w\s]/, "")
     return if message.empty?
 
     char_count = message.length
