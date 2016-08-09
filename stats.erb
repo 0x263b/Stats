@@ -570,7 +570,7 @@ footer {
 			xmlns="http://www.w3.org/2000/svg" 
 			xmlns:xlink="http://www.w3.org/1999/xlink"
 			xmlns:data="http://www.example.com/data">
-			<g id="hours-<%= user[:username] %>" class="user-hours" data:hours="<%= user[:hours] %>" stroke="none" stroke-width="1" fill="#ddd" transform="translate(0,40) scale(1,-1)">
+			<g id="hours-<%= user[:username].gsub(/\W+/, "-") %>" class="user-hours" data:hours="<%= user[:hours] %>" stroke="none" stroke-width="1" fill="#ddd" transform="translate(0,40) scale(1,-1)">
 				<% user[:hours].each_with_index do |hour, index| -%>
 <rect x="<%= index * 5 %>" y="0" width="4" height="<%= ((hour.to_f / user[:max_hour]) * 40).round %>"></rect>
 				<% end -%>
