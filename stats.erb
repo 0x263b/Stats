@@ -306,6 +306,9 @@ td img,td svg {
 	display: flex;
 	height: 40px;
 }
+.stacked-chart div {
+	box-shadow: inset -1px 0 0 0 #fff;
+}
 .stacked-chart div:nth-child(1), 
 #activity-percentage li:nth-child(1) .color { background-color: #c56edd }
 .stacked-chart div:nth-child(2), 
@@ -326,7 +329,7 @@ td img,td svg {
 #activity-percentage li:nth-child(9) .color { background-color: #5b6e7f }
 .stacked-chart div:nth-child(10), 
 #activity-percentage li:nth-child(10) .color { background-color: #75869b }
-.stacked-chart div:last-child { background-color: #8f9fb4; -webkit-box-flex: 1; flex-grow: 1; }
+.stacked-chart div:last-child { background-color: #8f9fb4; -webkit-box-flex: 1; flex-grow: 1; box-shadow: none; }
 
 #activity-percentage ol {
 	padding: 0;
@@ -588,7 +591,7 @@ footer {
 		<% @top_users.each do |user| -%>
 			<div title="<%= user[:username] %>" style="width:<%= (user[:word_count].to_f/@database[:channel][:word_count] * 100).round(2) -%>%"></div>
 		<% end -%>
-			<div class="last"></div>
+			<div class="last" title="Everyone else"></div>
 	</div>
 	<ol>
 	<% @top_users.each do |user| -%>
