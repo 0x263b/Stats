@@ -7,7 +7,6 @@ Encoding.default_external = "UTF-8"
 Encoding.default_internal = "UTF-8"
 
 require 'date'
-require 'cgi'
 require 'json'
 require 'yaml'
 require 'erb'
