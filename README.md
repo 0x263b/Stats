@@ -4,8 +4,9 @@ Stats/Analytics generator for IRC and Slack channels
 ### Demos
 * [Aligned Pixels, Ink. 🏇](https://kash.im/stats/aligned.html) ([Slack group](http://alignedpixels.com/), four channels)
 * [Designer Network](https://kash.im/stats/dn.html) ([IRC channel](http://designers.im/))
-* [NYCTech](https://kash.im/stats/nyctech.html) ([Slack Group](http://www.nyctechslack.com/), one channel)
+* [NYCTech](https://kash.im/stats/nyctech.html) ([Slack group](http://www.nyctechslack.com/), four channels)
 * [Spec.fm](https://kash.im/stats/spec.html) ([Slack group](http://spec.fm/), one channel)
+* [Webdev Collective](https://kash.im/stats/webdev.html) ([Slack group](http://webdev-collective.clarkt.com/), one channel)
 
 Slack provides a stats page of their own at `https://<group>.slack.com/stats` ([Example output from NYCTech](https://i.imgur.com/CUDfoPx.png))
 
