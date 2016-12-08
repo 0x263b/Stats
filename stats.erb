@@ -5,38 +5,21 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title><%= @config[:title] %> Stats</title>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
 <style>
-@font-face {
-	font-family: 'Roboto';
-	font-style: normal;
-	font-weight: 300;
-	src: local('Roboto Light'), local('Roboto-Light'), url(https://fonts.gstatic.com/s/roboto/v15/Hgo13k-tfSpn0qi1SFdUfZBw1xU1rKptJj_0jans920.woff2) format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
-}
-@font-face {
-	font-family: 'Roboto';
-	font-style: normal;
-	font-weight: 400;
-	src: local('Roboto'), local('Roboto-Regular'), url(https://fonts.gstatic.com/s/roboto/v15/oMMgfZMQthOryQo9n22dcuvvDin1pK8aKteLpeZ5c0A.woff2) format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
-}
-@font-face {
-	font-family: 'Roboto';
-	font-style: normal;
-	font-weight: 500;
-	src: local('Roboto Medium'), local('Roboto-Medium'), url(https://fonts.gstatic.com/s/roboto/v15/RxZJdnzeo3R5zSexge8UUZBw1xU1rKptJj_0jans920.woff2) format('woff2');
-	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
-}
 * {
 	box-sizing: border-box;
 }
 html,body {
-	font: normal 16px/1.5 "Roboto", "Open Sans", "Noto Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+	font: normal 16px/1.5 "Roboto", "Noto Sans", "Open Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
 	-webkit-transition: opacity 0.5s ease-in-out;
 	transition: opacity 0.5s ease-in-out;
 	margin: 0;
 	background-color: #fff;
 	color: #333;
+}
+body {
+	opacity: 0;
 }
 a {
 	text-decoration: none;
@@ -105,7 +88,6 @@ header hr {
 }
 
 @media (max-width: 500px) {
-
 	.activity-numbers div {
 		min-width: 140px;
 		-webkit-box-flex: 1;
@@ -274,6 +256,7 @@ td img {
 	background-color: #aaa;
 	border-radius: 4px;
 	margin-right: 15px;
+	display: inline-block;
 }
 td img,td svg {
 	vertical-align: middle;
@@ -401,10 +384,11 @@ footer {
 	margin-top: 50px;
 }
 </style>
+<noscript>
+	<style> body { opacity: 1; } </style>
+</noscript>
 </head>
 <body id="body">
-<script> document.getElementById("body").style.opacity = 0; </script>
-
 <main role="main">
 <header>
 	<h1><%= @config[:title] %></h1>
@@ -636,17 +620,17 @@ footer {
 </div>
 
 <footer>
-<div>By <a href="https://kash.im">Abram Kash</a></div>
+<div>Stats by <a href="https://kash.im/stats/">Abram Kash</a> <a href="https://github.com/0x263b/Stats">(source)</a></div>
 </footer>
 </main>
 <script>
-"use strict"
+'use strict'
 
 // Scroll chart to the left if it overflows
-var element = document.querySelector("#charts .chart")
+var element = document.querySelector('#charts .chart')
 element.scrollLeft = element.scrollWidth
 
-var element = document.querySelector("#months .months-chart")
+var element = document.querySelector('#months .months-chart')
 element.scrollLeft = element.scrollWidth
 
 
@@ -664,9 +648,9 @@ var forEach = function (array, callback, scope) {
 
 // 1234 → 1,234
 function addCommas(number) {
-	var parts = number.toString().split(".")
-	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-	return parts.join(".")
+	var parts = number.toString().split('.')
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+	return parts.join('.')
 }
 
 function listenAll(selector, event, fn) {
@@ -681,33 +665,33 @@ function insertHTML(selector, html) {
 }
 
 function daysHover(event) {
-	var lines = event.target.getAttribute("data:lines")
-	var date  = event.target.getAttribute("data:date")
-	insertHTML("#charts .hover .date", date)
-	insertHTML("#charts .hover .lines", addCommas(lines) + " lines")
+	var lines = event.target.getAttribute('data:lines')
+	var date  = event.target.getAttribute('data:date')
+	insertHTML('#charts .hover .date', date)
+	insertHTML('#charts .hover .lines', addCommas(lines) + ' lines')
 }
 
 function weeksHover(event) {
-	var lines = event.target.getAttribute("data:lines")
-	var first = event.target.getAttribute("data:first")
-	var last  = event.target.getAttribute("data:last")
-	insertHTML("#charts .hover .date", first + " – " + last)
-	insertHTML("#charts .hover .lines", addCommas(lines) + " lines")
+	var lines = event.target.getAttribute('data:lines')
+	var first = event.target.getAttribute('data:first')
+	var last  = event.target.getAttribute('data:last')
+	insertHTML('#charts .hover .date', first + ' – ' + last)
+	insertHTML('#charts .hover .lines', addCommas(lines) + ' lines')
 }
 
 function hoursHover(event) {
-	var lines = event.target.getAttribute("data:lines")
-	insertHTML("#hourly .hover .lines", addCommas(lines) + " lines")
+	var lines = event.target.getAttribute('data:lines')
+	insertHTML('#hourly .hover .lines', addCommas(lines) + ' lines')
 }
 
 // Shift timezone
-var svgns = "http://www.w3.org/2000/svg"
+var svgns = 'http://www.w3.org/2000/svg'
 
 var local_time = new Date()
 var local_zone = local_time.getTimezoneOffset()/60
 
-var timezone_label = (local_zone > 0) ? "GMT–" + local_zone : "GMT+" + Math.abs(local_zone)
-var timezone_labels = document.querySelectorAll(".timezone-label")
+var timezone_label = (local_zone > 0) ? 'GMT–' + local_zone : 'GMT+' + Math.abs(local_zone)
+var timezone_labels = document.querySelectorAll('.timezone-label')
 forEach(timezone_labels, function (index, value) {
 	timezone_labels[index].innerHTML = timezone_label
 })
@@ -738,7 +722,7 @@ function parseHours(array, selector, h, i ,w){
 			rect.setAttributeNS(null, 'y', '0')
 			rect.setAttributeNS(null, 'height', height)
 			rect.setAttributeNS(null, 'width',  w)
-			rect.setAttributeNS("http://www.examples.com/data", 'data:lines',  lines)
+			rect.setAttributeNS('http://www.examples.com/data', 'data:lines',  lines)
 
 		node.appendChild(rect)
 	})
@@ -749,8 +733,8 @@ function parseHours(array, selector, h, i ,w){
 function naturalCompare(a, b) {
 	var ax = [], bx = []
 
-	a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) })
-	b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) })
+	a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || '']) })
+	b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || '']) })
 	
 	while (ax.length && bx.length) {
 		var an = ax.shift()
@@ -770,7 +754,7 @@ function sortTable(table, col, reverse) {
 	reverse = -((+reverse) || -1)
 
 	tr = tr.sort(function(a, b) { 
-		return reverse * naturalCompare(b.cells[col].getAttribute("data").trim(), a.cells[col].getAttribute("data").trim()) 
+		return reverse * naturalCompare(b.cells[col].getAttribute('data').trim(), a.cells[col].getAttribute('data').trim()) 
 	})
 
 	// append each row in order
@@ -811,40 +795,39 @@ function formatDate(timestamp) {
 		m = shortMonths[date.getMonth()],
 		d = date.getDate()
 
-	return w + ", " + m + " " + d;
+	return w + ', ' + m + ' ' + d;
 }
 
 function formatAllDates() {
 	var dates = document.querySelectorAll('.date')
 	forEach(dates, function (index, value) {
-		dates[index].innerHTML = formatDate(dates[index].getAttribute("data"))
+		dates[index].innerHTML = formatDate(dates[index].getAttribute('data'))
 	})
 }
 
 function parseAllHours() {
 	var nodes = document.querySelectorAll('.user-hours')
 	forEach(nodes, function (index, value) {
-		var hours = nodes[index].getAttribute("data:hours")
-		var id = nodes[index].getAttribute("id")
+		var hours = nodes[index].getAttribute('data:hours')
+		var id = nodes[index].getAttribute('id')
 		parseHours(JSON.parse(hours), '#'+id, 40, 5, 4)
 	})
 }
 
 
 (function(){
-	parseHours(<%= @database[:hours] %>, "#hours", 100, 10, 9)
+	parseHours(<%= @database[:hours] %>, '#hours', 100, 10, 9)
 	parseAllHours()
 	makeAllSortable()
 	formatAllDates()
 
-	listenAll("#days rect",  "mouseover", daysHover)
-	listenAll("#weeks rect", "mouseover", weeksHover)
-	listenAll("#hours rect", "mouseover", hoursHover)
-	listenAll("#weekdays rect", "mouseover", hoursHover)
+	listenAll('#days rect',  'mouseover', daysHover)
+	listenAll('#weeks rect', 'mouseover', weeksHover)
+	listenAll('#hours rect', 'mouseover', hoursHover)
+	listenAll('#weekdays rect', 'mouseover', hoursHover)
 
-	document.getElementById("body").style.opacity = 1
+	document.getElementById('body').style.opacity = 1
 })()
-
 </script>
 </body>
 </html>

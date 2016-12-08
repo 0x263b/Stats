@@ -54,16 +54,17 @@ def new_user(nick, timestamp)
     :max_hour    => nil,
     :hours       => Array.new(24, 0),
     :days        => Hash.new,
-    :words       => Array.new
+    # :words     => Array.new
+    :words       => Hash.new
   }
 end
 
 # clean fields from user and calculate totals/averages
 def clean_user(nick)
-  nick[:words] = nick[:words].flatten.uniq
-  # delete urls
-  nick[:words].reject!{ |word| word.start_with?("http") }
-  nick[:words].uniq!
+  # nick[:words] = nick[:words].flatten.uniq
+  # nick[:words].reject!{ |word| word.start_with?("http") }
+  # nick[:words].uniq!
+  nick[:words].reject!{ |k,v| k.to_s.start_with?("http") }
 
   nick[:vocabulary]  = nick[:words].length
   nick[:days_total]  = nick[:days].length
@@ -129,7 +130,16 @@ def parse_message(data, action)
     nick[:line_count] += 1
     nick[:word_count] += words.length
     nick[:char_count] += char_count
-    nick[:words] << words
+    
+    # nick[:words] << words
+    words.each do |word|
+      word = word.to_sym
+      if nick[:words].has_key?(word)
+        nick[:words][word] += 1
+      else
+        nick[:words][word] = 1
+      end
+    end
 
     @database[:channel][:line_count] += 1
     @database[:channel][:word_count] += words.length
@@ -271,8 +281,12 @@ else
 end
 
 # Alpha and Omega
-first_day = Time.at(@database[:channel][:first]).utc.to_datetime
-last_day = Time.at(@database[:channel][:last]).utc.to_datetime
+first_day = Time.at(@database[:channel][:first]).utc
+last_day = Time.at(@database[:channel][:last]).utc
+
+first_day = Date.new(first_day.year, first_day.month, first_day.day)
+last_day  = Date.new(last_day.year, last_day.month, last_day.day)
+
 now = Date.today
 ten_weeks_ago = (now - 70).to_datetime
 
@@ -398,7 +412,7 @@ first_day.upto(last_day) do |date|
   @days << {:x => x, :y => y, :date => date.strftime("%a, %b %e"), :class => css_class, :lines => lines}
 
   # April, July, October
-  if [92, 183, 274].include?(date.yday)
+  if [92, 183, 275].include?(date.yday)
     @labels << {:x => x, :month => date.strftime("%B") }
     @mlabels << {:x => mx, :month => date.strftime("%B") }
   end
