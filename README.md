@@ -1,5 +1,5 @@
 # Stats
-Stats/Analytics generator for IRC and Slack channels
+Stats/Analytics generator for IRC, Slack and Twitch channels
 
 ### Demos
 * [Aligned Pixels, Ink. 🏇](https://kash.im/stats/aligned.html) ([Slack group](http://alignedpixels.com/), four channels)
