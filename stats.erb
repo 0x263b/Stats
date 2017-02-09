@@ -7,26 +7,57 @@
 <title><%= @config[:title] %> Stats</title>
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
 <style>
+<%
+	# Basic palette
+	background = "white"
+	text_color = "#333"
+	link_color = "black"
+	link_hover = "#534e94"
+	border_color = "#ddd"
+	heading_color = "#999"
+
+	# Heatmap
+	heatmap_1 = "#c2d0de"
+	heatmap_2 = "#8495ab"
+	heatmap_3 = "#4e5f73"
+	heatmap_4 = "#534e94"
+	heatmap_5 = "#825db8"
+	heatmap_6 = "#c56edd"
+	heatmap_h = "#00d1fd"
+
+	# Stacked chart
+	stacked_1  = "#c56edd"
+	stacked_2  = "#ad68d0"
+	stacked_3  = "#8d60bf"
+	stacked_4  = "#7458af"
+	stacked_5  = "#5e509f"
+	stacked_6  = "#514e90"
+	stacked_7  = "#4e527d"
+	stacked_8  = "#4e5c73"
+	stacked_9  = "#5b6e7f"
+	stacked_10 = "#75869b"
+	stacked_11 = "#8f9fb4"
+
+%>
 * {
 	box-sizing: border-box;
 }
 html,body {
 	font: normal 16px/1.5 "Roboto", "Noto Sans", "Open Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-	-webkit-transition: opacity 0.5s ease-in-out;
 	transition: opacity 0.5s ease-in-out;
 	margin: 0;
-	background-color: #fff;
-	color: #333;
+	background-color: <%= background %>;
+	color: <%= text_color %>;
 }
 body {
 	opacity: 0;
 }
 a {
 	text-decoration: none;
-	color: black;
+	color: <%= link_color %>;
 }
 a:hover {
-	color: #534e94;
+	color: <%= link_hover %>;
 }
 main {
 	max-width: 630px;
@@ -46,20 +77,20 @@ h2 {
 }
 h4 {
 	text-align: center;
-	font-weight: normal;
+	font-weight: 500;
 	font-size: 12px;
 	margin-top: -50px;
 	margin-bottom: 50px;
-	color: #999;
+	color: <%= heading_color %>;
 }
 hr {
 	border: none;
 	height: 1px;
-	background-color: #ddd;
+	background-color: <%= border_color %>;
 	margin: 50px auto;
 }
 p {
-	color: #999;
+	color: <%= heading_color %>;
 	font-weight: 300;
 	font-size: 14px;
 	margin: auto;
@@ -67,13 +98,12 @@ p {
 header p {
 	max-width: 400px;
 	font-size: 16px;
-	color: #555;
+	color: <%= text_color %>;
 }
 header hr {
 	max-width: 200px;
 }
 .activity-numbers {
-	display: -webkit-box;
 	display: flex;
 	flex-flow: row wrap;
 	width: 100%;
@@ -82,7 +112,6 @@ header hr {
 	padding: 10px 0;
 	font-size: 30px;
 	font-weight: 300;
-	-webkit-box-flex: 1;
 	flex-grow: 1;
 	text-align: center;
 }
@@ -90,9 +119,7 @@ header hr {
 @media (max-width: 500px) {
 	.activity-numbers div {
 		min-width: 140px;
-		-webkit-box-flex: 1;
 		flex: 1 1 0;
-		-webkit-flex: 1 1 auto;
 	}
 }
 
@@ -109,34 +136,33 @@ text {
 	font-size: 12px;
 }
 .chart rect:hover {
-	fill: #00d1fd;
+	fill: <%= heatmap_h %>;
 }
 .scale-1 {
-	fill: #c2d0de;
-	border-color: #c2d0de;
+	fill: <%= heatmap_1 %>;
+	border-color: <%= heatmap_1 %>;
 }
 .scale-2 {
-	fill: #8495ab;
-	border-color: #8495ab;
+	fill: <%= heatmap_2 %>;
+	border-color: <%= heatmap_2 %>;
 }
 .scale-3 {
-	fill: #4e5f73;
-	border-color: #4e5f73;
+	fill: <%= heatmap_3 %>;
+	border-color: <%= heatmap_3 %>;
 }
 .scale-4 {
-	fill: #534e94;
-	border-color: #534e94;
+	fill: <%= heatmap_4 %>;
+	border-color: <%= heatmap_4 %>;
 }
 .scale-5 {
-	fill: #825db8;
-	border-color: #825db8;
+	fill: <%= heatmap_5 %>;
+	border-color: <%= heatmap_5 %>;
 }
 .scale-6 {
-	fill: #c56edd;
-	border-color: #c56edd;
+	fill: <%= heatmap_6 %>;
+	border-color: <%= heatmap_6 %>;
 }
 .key {
-	display: -webkit-box;
 	display: flex;
 	position: absolute;
 	top: 237px;
@@ -183,7 +209,6 @@ text {
 }
 
 @media (max-width: 500px) {
-
 	#charts .hover {
 		font-size: 12px;
 	}
@@ -198,14 +223,12 @@ text {
 #hourly .hover {
 	position: absolute;
 	top: 135px;
-	display: -webkit-box;
 	display: flex;
 	width: 100%;
 	font-size: 14px;
 }
 #hourly .lines {
 	text-align: right;
-	-webkit-box-flex: 1;
 	flex-grow: 1;
 }
 #active-users,#top-users {
@@ -214,10 +237,8 @@ text {
 }
 
 #user-hours {
-	display: -webkit-box;
 	display: flex;
 	flex-flow: row wrap;
-	-webkit-box-pack: center;
 	justify-content: center;
 }
 #user-hours > div {
@@ -243,7 +264,7 @@ th {
 }
 td {
 	padding: 5px 0;
-	border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid <%= border_color %>;
 }
 td:first-child {
 	font-size: 20px;
@@ -253,7 +274,7 @@ td:first-child {
 td img {
 	width: 45px;
 	height: 45px;
-	background-color: #aaa;
+	background-color: <%= border_color %>;
 	border-radius: 4px;
 	margin-right: 15px;
 	display: inline-block;
@@ -263,10 +284,9 @@ td img,td svg {
 }
 
 @media (max-width: 500px) {
-
 	td:first-child {
 		font-size: 16px;
-		font-weight: normal;
+		font-weight: 500;
 	}
 	th:nth-last-child(2),td:nth-last-child(2),th:last-child,td:last-child {
 		display: none;
@@ -279,47 +299,44 @@ td img,td svg {
 #user-hours img {
 	width: 20px;
 	height: 20px;
-	background-color: #aaa;
+	background-color: <%= border_color %>;
 	border-radius: 4px;
 	vertical-align: middle;
 	margin-right: 10px;
 }
 .stacked-chart {
-	display: -webkit-box;
 	display: flex;
 	height: 40px;
 }
 .stacked-chart div {
-	box-shadow: inset -1px 0 0 0 #fff;
+	box-shadow: inset -1px 0 0 0 <%= background %>;
 }
 .stacked-chart div:nth-child(1), 
-#activity-percentage li:nth-child(1) .color { background-color: #c56edd }
+#activity-percentage li:nth-child(1) .color { background-color: <%= stacked_1 %> }
 .stacked-chart div:nth-child(2), 
-#activity-percentage li:nth-child(2) .color { background-color: #ad68d0 }
+#activity-percentage li:nth-child(2) .color { background-color: <%= stacked_2 %> }
 .stacked-chart div:nth-child(3), 
-#activity-percentage li:nth-child(3) .color { background-color: #8d60bf }
+#activity-percentage li:nth-child(3) .color { background-color: <%= stacked_3 %> }
 .stacked-chart div:nth-child(4), 
-#activity-percentage li:nth-child(4) .color { background-color: #7458af }
+#activity-percentage li:nth-child(4) .color { background-color: <%= stacked_4 %> }
 .stacked-chart div:nth-child(5), 
-#activity-percentage li:nth-child(5) .color { background-color: #5e509f }
+#activity-percentage li:nth-child(5) .color { background-color: <%= stacked_5 %> }
 .stacked-chart div:nth-child(6), 
-#activity-percentage li:nth-child(6) .color { background-color: #514e90 }
+#activity-percentage li:nth-child(6) .color { background-color: <%= stacked_6 %> }
 .stacked-chart div:nth-child(7), 
-#activity-percentage li:nth-child(7) .color { background-color: #4e527d }
+#activity-percentage li:nth-child(7) .color { background-color: <%= stacked_7 %> }
 .stacked-chart div:nth-child(8), 
-#activity-percentage li:nth-child(8) .color { background-color: #4e5c73 }
+#activity-percentage li:nth-child(8) .color { background-color: <%= stacked_8 %> }
 .stacked-chart div:nth-child(9), 
-#activity-percentage li:nth-child(9) .color { background-color: #5b6e7f }
+#activity-percentage li:nth-child(9) .color { background-color: <%= stacked_9 %> }
 .stacked-chart div:nth-child(10), 
-#activity-percentage li:nth-child(10) .color { background-color: #75869b }
-.stacked-chart div:last-child { background-color: #8f9fb4; -webkit-box-flex: 1; flex-grow: 1; box-shadow: none; }
+#activity-percentage li:nth-child(10) .color { background-color: <%= stacked_10 %> }
+.stacked-chart div:last-child { background-color: <%= stacked_11 %>; flex-grow: 1; box-shadow: none; }
 
 #activity-percentage ol {
 	padding: 0;
 	margin: 50px auto;
-	-webkit-column-count: 2;
-	   -moz-column-count: 2;
-	        column-count: 2;
+	column-count: 2;
 }
 #activity-percentage li {
 	font-size: 16px;
@@ -341,13 +358,9 @@ td img,td svg {
 	display: inline-block;
 }
 #months {
-	display: -webkit-box;
 	display: flex;
-	-webkit-box-orient: horizontal;
-	-webkit-box-direction: normal;
-	        flex-direction: row;
-	-webkit-box-pack: center;
-	        justify-content: center;
+	flex-direction: row;
+	justify-content: center;
 }
 .months-chart {
 	overflow-x: auto;
@@ -377,7 +390,7 @@ footer:before {
 	display: inline-block;
 	height: 1px;
 	margin: 0 0 13px;
-	background-color: #999;
+	background-color: <%= text_color %>;
 }
 footer {
 	font-size: 12px;
@@ -639,13 +652,6 @@ Array.prototype.pushArray = function() {
 	this.push.apply(this, this.concat.apply([], arguments))
 }
 
-// forEach method, could be shipped as part of an Object Literal/Module
-var forEach = function (array, callback, scope) {
-	for (var i = 0; i < array.length; i++) {
-		callback.call(scope, i, array[i])
-	}
-}
-
 // 1234 → 1,234
 function addCommas(number) {
 	var parts = number.toString().split('.')
@@ -692,9 +698,9 @@ var local_zone = local_time.getTimezoneOffset()/60
 
 var timezone_label = (local_zone > 0) ? 'GMT–' + local_zone : 'GMT+' + Math.abs(local_zone)
 var timezone_labels = document.querySelectorAll('.timezone-label')
-forEach(timezone_labels, function (index, value) {
-	timezone_labels[index].innerHTML = timezone_label
-})
+for (var timezones of timezone_labels) {
+	timezones.innerHTML = timezone_label
+}
 
 function parseHours(array, selector, h, i ,w){
 	var node = document.querySelector(selector)
@@ -758,7 +764,7 @@ function sortTable(table, col, reverse) {
 	})
 
 	// append each row in order
-	for (var i = 0; i < tr.length; ++i) {
+	for (var i = 0; i < tr.length; i++) {
 		tb.appendChild(tr[i])
 	}
 }
@@ -767,7 +773,7 @@ function sortTable(table, col, reverse) {
 function makeSortable(table) {
 	var th = table.tHead
 	th && (th = th.rows[0]) && (th = th.cells)
-	for (var i = 0; i < th.length; ++i) {
+	for (var i = 0; i < th.length; i++) {
 		(function(i) {
 			var dir = 1
 			th[i].addEventListener('click', function() {
@@ -780,9 +786,9 @@ function makeSortable(table) {
 // Find every table
 function makeAllSortable() {
 	var tables = document.getElementsByTagName('table')
-	forEach(tables, function (index, value) {
-		makeSortable(tables[index])
-	})
+	for (var table of tables) {
+		makeSortable(table)
+	}
 }
 
 // Format last seen dates => Sat, May 21
@@ -795,23 +801,23 @@ function formatDate(timestamp) {
 		m = shortMonths[date.getMonth()],
 		d = date.getDate()
 
-	return w + ', ' + m + ' ' + d;
+	return w + ', ' + m + ' ' + d
 }
 
 function formatAllDates() {
 	var dates = document.querySelectorAll('.date')
-	forEach(dates, function (index, value) {
-		dates[index].innerHTML = formatDate(dates[index].getAttribute('data'))
-	})
+	for (var date of dates) {
+		date.innerHTML = formatDate(date.getAttribute('data'))
+	}
 }
 
 function parseAllHours() {
 	var nodes = document.querySelectorAll('.user-hours')
-	forEach(nodes, function (index, value) {
-		var hours = nodes[index].getAttribute('data:hours')
-		var id = nodes[index].getAttribute('id')
+	for (var node of nodes) {
+		var hours = node.getAttribute('data:hours')
+		var id = node.getAttribute('id')
 		parseHours(JSON.parse(hours), '#'+id, 40, 5, 4)
-	})
+	}
 }
 
 
