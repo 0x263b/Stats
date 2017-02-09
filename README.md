@@ -69,4 +69,15 @@ Edit `config.yaml` and set `:location`to your log file, then run `stats.rb`. Thi
   fred:
     :url: http://www.something.com
     :avatar: http://www.something.com/stuff/fred.jpg
+ 
+# Twitch varirant specific
+
+# Custom twitch emotes
+:emotes:
+  - AWOO
+  - reckClap
+
+# Youtube API Key for !songrequest info
+:youtube_api: XXXXXXXXXXXXXXXXXXXX
+
 ```
